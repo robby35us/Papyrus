@@ -1,0 +1,3 @@
+rootProject.name='Papyrus Arabic'
+include ':app'
+include ':model'
