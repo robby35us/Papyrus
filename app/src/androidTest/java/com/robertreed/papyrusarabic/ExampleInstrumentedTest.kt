@@ -1,4 +1,4 @@
-package com.robertreed.android.papyrusarabic
+package com.robertreed.papyrusarabic
 
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4

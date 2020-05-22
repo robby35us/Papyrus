@@ -1,4 +1,4 @@
-package com.robertreed.android.model
+package com.robertreed.papyrusarabic.model
 
 import androidx.room.Entity
 import androidx.room.ForeignKey
@@ -16,4 +16,5 @@ data class Page(@PrimaryKey val id: UUID = UUID.randomUUID(),
                 var content1 : String = "",
                 var content2 : String = "",
                 var content3 : String = "",
-                var pageType: PageType)
+                var pageType: PageType
+)

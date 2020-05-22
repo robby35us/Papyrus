@@ -1,4 +1,4 @@
-package com.robertreed.android.model
+package com.robertreed.papyrusarabic.model
 
 import androidx.annotation.Nullable
 import androidx.room.Entity
