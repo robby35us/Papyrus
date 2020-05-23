@@ -5,11 +5,16 @@ import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 import java.util.*
 
-@Entity(foreignKeys = [ForeignKey(entity = PageType::class,
-    parentColumns = arrayOf("pageType"),
-    childColumns = arrayOf("id"))])
+@Entity(foreignKeys = [ForeignKey(entity = Lesson::class,
+                                parentColumns = arrayOf("lessonId"),
+                                childColumns = arrayOf("id")),
+                        ForeignKey(entity = PageType::class,
+                                parentColumns = arrayOf("pageType"),
+                                childColumns = arrayOf("id"))])
 data class Page(@PrimaryKey val id: UUID = UUID.randomUUID(),
-                var referenceData: String,
+                var lessonId: UUID,
+                var number: Int,
+                var label: String,
                 var image: UUID,
                 var header: String,
                 var contentOther: String = "",
