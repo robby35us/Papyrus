@@ -20,20 +20,34 @@ class LocationDataNavigator(startLocation: LocationData
 
     init {
         moduleIt = repository.getModuleIterator()
+        moduleIt.setIndex(startLocation.moduleNum)
+
         lessonIt = repository.getLessonIterator(startLocation.moduleNum)
+        lessonIt.setIndex(startLocation.lessonNum)
+
         pageIt = repository.getPageIterator(
                 startLocation.moduleNum, startLocation.lessonNum)
+        pageIt.setIndex(startLocation.pageNum)
     }
 
-    fun setItLocations(locationData: LocationData) {
+    fun setLocation(locationData: LocationData) {
         moduleIt.setIndex(locationData.moduleNum)
+
+        lessonIt = repository.getLessonIterator(locationData.moduleNum)
         lessonIt.setIndex(locationData.lessonNum)
+
+        pageIt = repository.getPageIterator(
+            locationData.moduleNum, locationData.lessonNum)
         pageIt.setIndex(locationData.pageNum)
     }
+
+    fun getLocation() = LocationData(moduleIt.peek().number,
+        lessonIt.peek().number, pageIt.peek().number)
 
     fun getModule() = moduleIt.peek()
     fun getLesson() = lessonIt.peek()
     fun getPage() = pageIt.peek()
+    fun numPages() = pageIt.size()
 
     fun hasNextModule() = moduleIt.hasNext()
     fun hasPrevModule() = moduleIt.previousIndex() > 0
