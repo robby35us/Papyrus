@@ -26,7 +26,7 @@ class SplashScreen: Fragment(), View.OnClickListener {
         savedInstanceState: Bundle?
     ): View? {
 
-        val view = inflater.inflate(R.layout.fragment_splash, container, false)
+        val view = inflater.inflate(R.layout.fragment_splash_screen, container, false)
 
         screen = view.findViewById(R.id.splash_screen)
         screen.setOnClickListener(this)

@@ -1,5 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto" android:id="@+id/nav_graph">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/splashScreen">
 
+    <fragment
+        android:id="@+id/splashScreen"
+        android:name="com.robertreed.papyrusarabic.ui.destinations.SplashScreen"
+        android:label="fragment_splash_screen"
+        tools:layout="@layout/fragment_splash_screen" >
+        <action
+            android:id="@+id/action_splashScreen_to_moduleSelectionFragment"
+            app:destination="@id/moduleSelectionFragment"
+            app:enterAnim="@android:anim/fade_in"
+            app:exitAnim="@android:anim/fade_out"
+            app:popEnterAnim="@android:anim/fade_in"
+            app:popExitAnim="@android:anim/fade_out" />
+    </fragment>
+    <fragment
+        android:id="@+id/moduleSelectionFragment"
+        android:name="com.robertreed.papyrusarabic.ui.destinations.ModuleSelectionFragment"
+        android:label="fragment_module_selection"
+        tools:layout="@layout/fragment_module_selection" >
+        <action
+            android:id="@+id/action_moduleSelectionFragment_self"
+            app:destination="@id/moduleSelectionFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
+        <action
+            android:id="@+id/action_moduleSelectionFragment_to_moduleContentFragment"
+            app:destination="@id/moduleContentFragment"
+            app:enterAnim="@anim/push_up_in"
+            app:exitAnim="@anim/push_up_out"
+            app:popEnterAnim="@anim/push_down_in"
+            app:popExitAnim="@anim/push_down_out" />
+    </fragment>
+    <fragment
+        android:id="@+id/moduleContentFragment"
+        android:name="com.robertreed.papyrusarabic.ui.destinations.ModuleContentFragment"
+        android:label="fragment_module_content"
+        tools:layout="@layout/fragment_module_content" />
 </navigation>
