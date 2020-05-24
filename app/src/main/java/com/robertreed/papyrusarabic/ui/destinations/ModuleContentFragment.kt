@@ -14,7 +14,7 @@ import androidx.navigation.fragment.findNavController
 import com.robertreed.papyrusarabic.R
 import com.robertreed.papyrusarabic.ui.MainViewModel
 
-class ModuleIntroFragment : Fragment() {
+class ModuleContentFragment : Fragment() {
 
     private val viewModel : MainViewModel by activityViewModels()
 
@@ -31,30 +31,28 @@ class ModuleIntroFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val view = inflater.inflate(R.layout.fragment_module_intro, container, false)
+        val view = inflater.inflate(R.layout.fragment_module_content, container, false)
 
-        val args = viewModel.getCurrentPage()
-            ?: throw  IllegalStateException()
-
+        val page = viewModel.getCurrentPage()
 
         moduleId = view.findViewById(R.id.context)
-        moduleId.setText(args[0])
+        moduleId.setText(page.number)
 
         header = view.findViewById(R.id.header)
-        header.setText(args[1])
+        header.text = page.header
 
         content1 = view.findViewById(R.id.content1)
-        content1.setText(args[2])
+        content1.text = page.content1
 
         content2 = view.findViewById(R.id.content2)
-        content2.setText(args[3])
+        content2.text = page.content2
 
         content3 = view.findViewById(R.id.content3)
-        content3.setText(args[4])
+        content3.text = page.content3
 
         navLeft = view.findViewById(R.id.nav_left)
         navLeft.setOnClickListener {
-            viewModel.navUpToTopLevel()
+            viewModel.navOutOfModule()
             findNavController().navigateUp()
         }
 

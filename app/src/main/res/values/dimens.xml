@@ -2,4 +2,5 @@
 <resources>
     <dimen name="card_corner_radius">6dp</dimen>
     <dimen name="card_elevation">8dp</dimen>
+    <dimen name="default_padding">16dp</dimen>
 </resources>

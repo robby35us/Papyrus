@@ -38,7 +38,7 @@ android {
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation 'com.android.support:multidex:1.0.3' //enable multi-dex
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
     implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.3.0-alpha03'
     implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.3.0-alpha03'
     implementation 'androidx.appcompat:appcompat:1.1.0'
