@@ -5,7 +5,7 @@ import com.robertreed.papyrusarabic.repository.LocationData
 import com.robertreed.papyrusarabic.repository.LocationDataNavigator
 import com.robertreed.papyrusarabic.repository.MODULE_PAGE_NUM_OFFSET
 
-class MainViewModel() : ViewModel() {
+class MainViewModel : ViewModel() {
 
     private var startLocation = LocationData(0,0,0)
     private var farthestLocation = LocationData(0,0,0)

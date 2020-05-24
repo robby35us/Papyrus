@@ -14,7 +14,7 @@ import androidx.navigation.fragment.findNavController
 import com.robertreed.papyrusarabic.R
 import com.robertreed.papyrusarabic.ui.MainViewModel
 
-class ModuleContentFragment : Fragment() {
+class LessonContentFragment : Fragment() {
 
     private val viewModel : MainViewModel by activityViewModels()
 
@@ -27,16 +27,16 @@ class ModuleContentFragment : Fragment() {
     private lateinit var navRight: ImageButton
 
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
+        inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val view = inflater.inflate(R.layout.fragment_module_content, container, false)
+        val view = inflater.inflate(R.layout.fragment_lesson_content, container, false)
 
         val page = viewModel.getCurrentPage()
 
+
         context = view.findViewById(R.id.context)
-        context.setText(page.number)
+        context.text = page.number.toString()
 
         header = view.findViewById(R.id.header)
         header.text = page.header
@@ -52,14 +52,25 @@ class ModuleContentFragment : Fragment() {
 
         navLeft = view.findViewById(R.id.nav_left)
         navLeft.setOnClickListener {
-            viewModel.navOutOfModule()
+            if(viewModel.hasPrevPage())
+                viewModel.navToPrevPage()
+            else
+                viewModel.navOutOfLesson()
             findNavController().navigateUp()
         }
 
         navRight = view.findViewById(R.id.nav_right)
         navRight.setOnClickListener {
-            viewModel.navToNextPage()
-            findNavController().navigate(R.id.action_moduleContentFragment_to_moduleListFragment)
+            if (viewModel.hasNextPage()) {
+                //viewModel.navToNextPage()
+                //findNavController().navigate(R.id.l)
+            } else {
+                viewModel.markLessonComplete()
+                val numPagesToPop = viewModel.numPagesInLesson()
+                viewModel.navOutOfLesson()
+                for (i in 0 until numPagesToPop)
+                    findNavController().popBackStack()
+            }
         }
         navRight.visibility = View.INVISIBLE
         navRight.isEnabled = false
@@ -98,4 +109,5 @@ class ModuleContentFragment : Fragment() {
             }, 7000)
         }
     }
+
 }

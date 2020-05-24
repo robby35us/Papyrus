@@ -19,13 +19,13 @@ class ModuleListFragment : Fragment() {
 
     private val viewModel: MainViewModel by activityViewModels()
 
-    private lateinit var contentLabel: TextView
-    private lateinit var contentHeader: TextView
-    private lateinit var contentDescription: TextView
-    private lateinit var objectiveList: ListView
+    private lateinit var context: TextView
+    private lateinit var header: TextView
+    private lateinit var subHeader: TextView
+    private lateinit var contentList: ListView
     private lateinit var navLeft: ImageButton
     private lateinit var navRight: ImageButton
-    private lateinit var adapter : ObjectiveListAdapter
+    private lateinit var adapter : ContentListAdapter
 
 
     override fun onCreateView(
@@ -37,21 +37,21 @@ class ModuleListFragment : Fragment() {
 
         val page = viewModel.getCurrentPage()
 
-        contentLabel = view.findViewById(R.id.context)
-        contentLabel.text = page.number.toString()
+        context = view.findViewById(R.id.context)
+        context.text = page.number.toString()
 
-        contentHeader = view.findViewById(R.id.header)
-        contentHeader.text = page.header
+        header = view.findViewById(R.id.header)
+        header.text = page.header
 
-        contentDescription = view.findViewById(R.id.sub_header)
-        contentDescription.text = page.sub_header
+        subHeader = view.findViewById(R.id.sub_header)
+        subHeader.text = page.sub_header
 
 
-        adapter = ObjectiveListAdapter(arrayOf(page.content1!!, page.content2!!, page.content3!!))
+        adapter = ContentListAdapter(arrayOf(page.content1!!, page.content2!!, page.content3!!))
 
-        objectiveList = view.findViewById(R.id.content_list)
-        objectiveList.adapter = adapter
-        objectiveList.isEnabled = false
+        contentList = view.findViewById(R.id.content_list)
+        contentList.adapter = adapter
+        contentList.isEnabled = false
 
         navLeft = view.findViewById(R.id.nav_left)
         navLeft.setOnClickListener {
@@ -62,7 +62,7 @@ class ModuleListFragment : Fragment() {
         navRight = view.findViewById(R.id.nav_right)
         navRight.setOnClickListener {
             viewModel.navToNextPage()
-            findNavController().navigate(R.id.action_moduleContentOverviewFragment_to_lessonSelectionFragment)
+            findNavController().navigate(R.id.action_moduleListFragment_to_lessonSelectionFragment)
         }
         navRight.isEnabled = false
         navRight.visibility = View.INVISIBLE
@@ -115,7 +115,7 @@ class ModuleListFragment : Fragment() {
         }
     }
 
-    private inner class ObjectiveListAdapter(private val objectives: Array<String>) : BaseAdapter() {
+    private inner class ContentListAdapter(private val listItems: Array<String>) : BaseAdapter() {
         private var textViews = arrayListOf<View>()
 
         override fun getItem(position: Int): Any {
@@ -127,7 +127,7 @@ class ModuleListFragment : Fragment() {
         }
 
         override fun getCount(): Int {
-            return objectives.size
+            return listItems.size
         }
 
         override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
@@ -136,7 +136,7 @@ class ModuleListFragment : Fragment() {
             else
                 textViews.add(convertView)
             val textView = textViews[position].findViewById<TextView>(R.id.content)
-            textView?.text = objectives[position]
+            textView?.text = listItems[position]
             return textViews[position]
         }
     }

@@ -9,4 +9,7 @@
     <string name="module_selection_label">Choose a Module</string>
     <string name="start_module">Start Module</string>
     <string name="gold_star_off">Gold star not yet earned</string>
+    <string name="start_lesson">Start Lesson</string>
+    <string name="restart_lesson">Restart Lesson</string>
+    <string name="sample_toast_onclick">You clicked a button!</string>
 </resources>

@@ -20,7 +20,7 @@ class ModuleSelectionFragment : Fragment() {
     private val viewModel: MainViewModel by activityViewModels()
 
     private lateinit var cardView: CardView
-    private lateinit var moduleId: TextView
+    private lateinit var context: TextView
     private lateinit var header: TextView
     private lateinit var subHeader: TextView
     private lateinit var navLeft: ImageButton
@@ -44,8 +44,8 @@ class ModuleSelectionFragment : Fragment() {
             ))
         }
 
-        moduleId  = view.findViewById(R.id.context)
-        moduleId.text = page.number.toString()
+        context  = view.findViewById(R.id.context)
+        context.text = page.number.toString()
 
         header = view.findViewById(R.id.header)
         header.text = page.header

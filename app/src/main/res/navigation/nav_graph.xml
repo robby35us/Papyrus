@@ -42,5 +42,51 @@
         android:id="@+id/moduleContentFragment"
         android:name="com.robertreed.papyrusarabic.ui.destinations.ModuleContentFragment"
         android:label="fragment_module_content"
-        tools:layout="@layout/fragment_module_content" />
+        tools:layout="@layout/fragment_module_content" >
+        <action
+            android:id="@+id/action_moduleContentFragment_to_moduleListFragment"
+            app:destination="@id/moduleListFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
+    </fragment>
+    <fragment
+        android:id="@+id/moduleListFragment"
+        android:name="com.robertreed.papyrusarabic.ui.destinations.ModuleListFragment"
+        android:label="fragment_module_list"
+        tools:layout="@layout/fragment_module_list" >
+        <action
+            android:id="@+id/action_moduleListFragment_to_lessonSelectionFragment"
+            app:destination="@id/lessonSelectionFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
+    </fragment>
+    <fragment
+        android:id="@+id/lessonSelectionFragment"
+        android:name="com.robertreed.papyrusarabic.ui.destinations.LessonSelectionFragment"
+        android:label="fragment_lesson_selection"
+        tools:layout="@layout/fragment_lesson_selection" >
+        <action
+            android:id="@+id/action_lessonSelectionFragment_self"
+            app:destination="@id/lessonSelectionFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
+        <action
+            android:id="@+id/action_lessonSelectionFragment_to_lessonContentFragment"
+            app:destination="@id/lessonContentFragment"
+            app:enterAnim="@anim/push_up_in"
+            app:exitAnim="@anim/push_up_out"
+            app:popEnterAnim="@anim/push_down_in"
+            app:popExitAnim="@anim/push_down_out" />
+    </fragment>
+    <fragment
+        android:id="@+id/lessonContentFragment"
+        android:name="com.robertreed.papyrusarabic.ui.destinations.LessonContentFragment"
+        android:label="fragment_lesson_content"
+        tools:layout="@layout/fragment_lesson_content" />
 </navigation>

@@ -9,6 +9,7 @@ import com.robertreed.papyrusarabic.repository.iterators.LessonIterator
 import com.robertreed.papyrusarabic.repository.iterators.ModuleIterator
 import com.robertreed.papyrusarabic.repository.iterators.PageIterator
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import java.util.*
 
@@ -16,6 +17,7 @@ private const val DATABASE_NAME = "papyrus-database"
 private const val MODULE_NUM_OFFSET = 20
 class PapyrusRepository private constructor(context: Context){
 
+    private lateinit var loadJob: Job
     private val database: PapyrusDatabase = Room.databaseBuilder(
         context.applicationContext,
         PapyrusDatabase::class.java,
@@ -36,11 +38,13 @@ class PapyrusRepository private constructor(context: Context){
         database.clearAllTables()
     }
 
-    fun getModuleIterator(): ModuleIterator {
+    suspend fun getModuleIterator(): ModuleIterator {
+        loadJob.join()
         return moduleIt
     }
 
-    fun getLessonIterator(moduleIndex: Int) : LessonIterator {
+    suspend fun getLessonIterator(moduleIndex: Int) : LessonIterator {
+        loadJob.join()
         if (lessonIteratorArray[moduleIndex] == null) {
             val moduleId = moduleIt.get(moduleIndex).id
             val lessonList = lessonDao.getLessonsByModuleId(moduleId)
@@ -49,9 +53,10 @@ class PapyrusRepository private constructor(context: Context){
         return lessonIteratorArray[moduleIndex]!!
     }
 
-    fun getPageIterator(moduleIndex: Int, lessonIndex: Int): PageIterator {
+    suspend fun getPageIterator(moduleIndex: Int, lessonIndex: Int): PageIterator {
         val pageOffset = moduleIndex * MODULE_NUM_OFFSET + lessonIndex
         if (pageIteratorArray[pageOffset] == null) {
+            loadJob.join()
             val lessonIterator = getLessonIterator(moduleIndex)
             val lessonId = lessonIterator.get(lessonIndex).id
             val pageList = pageDao.getPagesByLessonID(lessonId)
@@ -109,9 +114,12 @@ class PapyrusRepository private constructor(context: Context){
         }
 
         fun get(): PapyrusRepository {
-            GlobalScope.launch {
-                INSTANCE?.moduleIt = ModuleIterator(INSTANCE?.moduleDao!!.getModules())
-                INSTANCE?.lessonIteratorArray = arrayOfNulls<LessonIterator?>(INSTANCE!!.moduleIt.size())
+            if(INSTANCE?.moduleIt?.size() ?: 0 == 0) {
+                INSTANCE?.loadJob = GlobalScope.launch {
+                    INSTANCE?.moduleIt = ModuleIterator(INSTANCE?.moduleDao!!.getModules())
+                    INSTANCE?.lessonIteratorArray =
+                        arrayOfNulls<LessonIterator?>(INSTANCE!!.moduleIt.size())
+                }
             }
             return INSTANCE
                 ?: throw IllegalStateException("Repository Must be initialized")
