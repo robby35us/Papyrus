@@ -4,9 +4,13 @@ import android.content.Context
 import android.util.SparseArray
 import androidx.room.Room
 import com.robertreed.papyrusarabic.database.PapyrusDatabase
+import com.robertreed.papyrusarabic.model.*
 import com.robertreed.papyrusarabic.repository.iterators.LessonIterator
 import com.robertreed.papyrusarabic.repository.iterators.ModuleIterator
 import com.robertreed.papyrusarabic.repository.iterators.PageIterator
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import java.util.*
 
 private const val DATABASE_NAME = "papyrus-database"
 private const val MODULE_NUM_OFFSET = 20
@@ -16,7 +20,7 @@ class PapyrusRepository private constructor(context: Context){
         context.applicationContext,
         PapyrusDatabase::class.java,
         DATABASE_NAME
-    ).build()
+    ).fallbackToDestructiveMigration().build()
 
     private val imageDao = database.imageDao()
     private val lessonDao = database.lessonDao()
@@ -24,9 +28,13 @@ class PapyrusRepository private constructor(context: Context){
     private val pageDao = database.pageDao()
     private val pageTypeDao = database.pageTypeDao()
 
-    private val moduleIt =  ModuleIterator(moduleDao.getModules())
-    private val lessonIteratorArray = arrayOfNulls<LessonIterator>(moduleIt.size())
+    private var moduleIt = ModuleIterator(listOf())
+    private var lessonIteratorArray = arrayOfNulls<LessonIterator>(0)
     private val pageIteratorArray = SparseArray<PageIterator>()
+
+    fun clearDatabase() {
+        database.clearAllTables()
+    }
 
     fun getModuleIterator(): ModuleIterator {
         return moduleIt
@@ -52,6 +60,46 @@ class PapyrusRepository private constructor(context: Context){
         return pageIteratorArray[pageOffset]!!
     }
 
+    fun insertModule(module: Module) {
+        moduleDao.insert(listOf(module))
+    }
+
+    fun getModule(uuid: UUID): Module? {
+        return moduleDao.getModule(uuid)
+    }
+
+    fun insertLesson(lesson: Lesson) {
+        lessonDao.insert(lesson)
+    }
+
+    fun getLesson(uuid: UUID): Lesson? {
+        return lessonDao.getLesson(uuid)
+    }
+
+    fun insertPageType(pageType: PageType) {
+        pageTypeDao.insert(pageType)
+    }
+
+    fun getPageType(uuid: UUID): PageType? {
+        return pageTypeDao.getPageType(uuid)
+    }
+
+    fun insertImage(image: Image) {
+        imageDao.insert(image)
+    }
+
+    fun getImage(uuid: UUID): Image? {
+        return imageDao.getImage(uuid)
+    }
+
+    fun insertPage(page: Page) {
+        pageDao.insert(page)
+    }
+
+    fun getPage(uuid: UUID) : Page? {
+        return pageDao.getPage(uuid)
+    }
+
     companion object {
         private  var INSTANCE: PapyrusRepository? = null
 
@@ -61,6 +109,10 @@ class PapyrusRepository private constructor(context: Context){
         }
 
         fun get(): PapyrusRepository {
+            GlobalScope.launch {
+                INSTANCE?.moduleIt = ModuleIterator(INSTANCE?.moduleDao!!.getModules())
+                INSTANCE?.lessonIteratorArray = arrayOfNulls<LessonIterator?>(INSTANCE!!.moduleIt.size())
+            }
             return INSTANCE
                 ?: throw IllegalStateException("Repository Must be initialized")
         }

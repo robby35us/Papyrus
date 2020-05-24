@@ -12,7 +12,7 @@ interface PageDao {
     @Query("SELECT * FROM page WHERE id=(:id)")
     fun getPage(id: UUID): Page?
 
-    @Query("SELECT id FROM page WHERE lessonId=(:lessonId) ORDER BY number")
+    @Query("SELECT * FROM page WHERE lessonId=(:lessonId) ORDER BY number")
     fun getPagesByLessonID(lessonId: UUID): List<Page>
 
     @Insert

@@ -12,7 +12,7 @@ interface LessonDao {
     @Query("SELECT * FROM lesson WHERE id=(:id)")
     fun getLesson(id: UUID): Lesson?
 
-    @Query("SELECT id FROM lesson WHERE moduleid=(:moduleId) ORDER BY number")
+    @Query("SELECT * FROM lesson WHERE moduleId=(:moduleId) ORDER BY number")
     fun getLessonsByModuleId(moduleId: UUID): List<Lesson>
 
     @Insert

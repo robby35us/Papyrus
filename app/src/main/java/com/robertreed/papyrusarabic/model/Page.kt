@@ -2,24 +2,30 @@ package com.robertreed.papyrusarabic.model
 
 import androidx.room.Entity
 import androidx.room.ForeignKey
+import androidx.room.Index
 import androidx.room.PrimaryKey
 import java.util.*
 
 @Entity(foreignKeys = [ForeignKey(entity = Lesson::class,
-                                parentColumns = arrayOf("lessonId"),
-                                childColumns = arrayOf("id")),
+                                parentColumns = arrayOf("id"),
+                                childColumns = arrayOf("lessonId")),
+                        ForeignKey(entity = Image::class,
+                                parentColumns = arrayOf("id"),
+                                childColumns = arrayOf("image")),
                         ForeignKey(entity = PageType::class,
-                                parentColumns = arrayOf("pageType"),
-                                childColumns = arrayOf("id"))])
+                                parentColumns = arrayOf("id"),
+                                childColumns = arrayOf("pageType"))],
+        indices = [Index(value = ["lessonId"], name = "page_lesson_id_index"),
+                   Index(value = ["image"], name = "page_image_index"),
+                   Index(value = ["pageType"], name = "page_page_type_index")])
 data class Page(@PrimaryKey val id: UUID = UUID.randomUUID(),
                 var lessonId: UUID,
                 var number: Int,
-                var label: String,
                 var image: UUID,
-                var header: String,
-                var contentOther: String = "",
-                var content1 : String = "",
-                var content2 : String = "",
-                var content3 : String = "",
-                var pageType: PageType
+                var header: String?,
+                var sub_header: String?,
+                var content1: String?,
+                var content2: String?,
+                var content3: String?,
+                var pageType: UUID
 )

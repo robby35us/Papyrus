@@ -6,6 +6,8 @@ import com.robertreed.papyrusarabic.model.Page
 import com.robertreed.papyrusarabic.repository.iterators.LessonIterator
 import com.robertreed.papyrusarabic.repository.iterators.ModuleIterator
 import com.robertreed.papyrusarabic.repository.iterators.PageIterator
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 const val LESSON_PAGE_NUM_OFFSET = 2
 const val MODULE_PAGE_NUM_OFFSET = 1
@@ -14,31 +16,37 @@ class LocationDataNavigator(startLocation: LocationData
             = LocationData(0, 0, 0)) {
 
     private val repository = PapyrusRepository.get()
-    private var moduleIt: ModuleIterator
-    private var lessonIt: LessonIterator
-    private var pageIt: PageIterator
+    private lateinit var moduleIt: ModuleIterator
+    private lateinit var lessonIt: LessonIterator
+    private lateinit var pageIt: PageIterator
 
     init {
-        moduleIt = repository.getModuleIterator()
-        moduleIt.setIndex(startLocation.moduleNum)
+        GlobalScope.launch {
+            moduleIt = repository.getModuleIterator()
+            moduleIt.setIndex(startLocation.moduleNum)
 
-        lessonIt = repository.getLessonIterator(startLocation.moduleNum)
-        lessonIt.setIndex(startLocation.lessonNum)
+            lessonIt = repository.getLessonIterator(startLocation.moduleNum)
+            lessonIt.setIndex(startLocation.lessonNum)
 
-        pageIt = repository.getPageIterator(
-                startLocation.moduleNum, startLocation.lessonNum)
-        pageIt.setIndex(startLocation.pageNum)
+            pageIt = repository.getPageIterator(
+                startLocation.moduleNum, startLocation.lessonNum
+            )
+            pageIt.setIndex(startLocation.pageNum)
+        }
     }
 
     fun setLocation(locationData: LocationData) {
-        moduleIt.setIndex(locationData.moduleNum)
+        GlobalScope.launch {
+            moduleIt.setIndex(locationData.moduleNum)
 
-        lessonIt = repository.getLessonIterator(locationData.moduleNum)
-        lessonIt.setIndex(locationData.lessonNum)
+            lessonIt = repository.getLessonIterator(locationData.moduleNum)
+            lessonIt.setIndex(locationData.lessonNum)
 
-        pageIt = repository.getPageIterator(
-            locationData.moduleNum, locationData.lessonNum)
-        pageIt.setIndex(locationData.pageNum)
+            pageIt = repository.getPageIterator(
+                locationData.moduleNum, locationData.lessonNum
+            )
+            pageIt.setIndex(locationData.pageNum)
+        }
     }
 
     fun getLocation() = LocationData(moduleIt.peek().number,
@@ -107,55 +115,63 @@ class LocationDataNavigator(startLocation: LocationData
 //    }
 
     fun navOutOfModule() {
-        val moduleNum = 0
-        val lessonNum = 0
-        val pageNum = moduleIt.peek().number + MODULE_PAGE_NUM_OFFSET
+        GlobalScope.launch {
+            val moduleNum = 0
+            val lessonNum = 0
+            val pageNum = moduleIt.peek().number + MODULE_PAGE_NUM_OFFSET
 
-        moduleIt = repository.getModuleIterator()
-        moduleIt.setIndex(moduleNum)
+            moduleIt = repository.getModuleIterator()
+            moduleIt.setIndex(moduleNum)
 
-        lessonIt = repository.getLessonIterator(moduleNum)
-        lessonIt.setIndex(lessonNum)
+            lessonIt = repository.getLessonIterator(moduleNum)
+            lessonIt.setIndex(lessonNum)
 
-        pageIt = repository.getPageIterator(moduleNum, lessonNum)
-        pageIt.setIndex(pageNum)
+            pageIt = repository.getPageIterator(moduleNum, lessonNum)
+            pageIt.setIndex(pageNum)
+        }
     }
 
     fun navIntoModule() {
-        val moduleNum = pageIt.peek().number - MODULE_PAGE_NUM_OFFSET
-        val lessonNum = 0
-        val pageNum = 0
-        moduleIt = repository.getModuleIterator()
-        moduleIt.setIndex(moduleNum)
+        GlobalScope.launch {
+            val moduleNum = pageIt.peek().number - MODULE_PAGE_NUM_OFFSET
+            val lessonNum = 0
+            val pageNum = 0
+            moduleIt = repository.getModuleIterator()
+            moduleIt.setIndex(moduleNum)
 
-        lessonIt = repository.getLessonIterator(moduleNum)
-        lessonIt.setIndex(lessonNum)
+            lessonIt = repository.getLessonIterator(moduleNum)
+            lessonIt.setIndex(lessonNum)
 
-        pageIt = repository.getPageIterator(moduleNum, lessonNum)
-        pageIt.setIndex(pageNum)
+            pageIt = repository.getPageIterator(moduleNum, lessonNum)
+            pageIt.setIndex(pageNum)
+        }
     }
 
     fun navOutOfLesson() {
-        val moduleNum = moduleIt.peek().number
-        val lessonNum = 0
-        val pageNum = lessonIt.peek().number + LESSON_PAGE_NUM_OFFSET
+        GlobalScope.launch {
+            val moduleNum = moduleIt.peek().number
+            val lessonNum = 0
+            val pageNum = lessonIt.peek().number + LESSON_PAGE_NUM_OFFSET
 
-        lessonIt = repository.getLessonIterator(moduleNum)
-        lessonIt.setIndex(lessonNum)
+            lessonIt = repository.getLessonIterator(moduleNum)
+            lessonIt.setIndex(lessonNum)
 
-        pageIt = repository.getPageIterator(moduleNum, lessonNum)
-        pageIt.setIndex(pageNum)
+            pageIt = repository.getPageIterator(moduleNum, lessonNum)
+            pageIt.setIndex(pageNum)
+        }
     }
 
     fun navIntoLesson() {
-        val moduleNum = moduleIt.peek().number
-        val lessonNum = pageIt.peek().number - LESSON_PAGE_NUM_OFFSET
-        val pageNum = 0
+        GlobalScope.launch {
+            val moduleNum = moduleIt.peek().number
+            val lessonNum = pageIt.peek().number - LESSON_PAGE_NUM_OFFSET
+            val pageNum = 0
 
-        lessonIt = repository.getLessonIterator(moduleNum)
-        lessonIt.setIndex(lessonNum)
+            lessonIt = repository.getLessonIterator(moduleNum)
+            lessonIt.setIndex(lessonNum)
 
-        pageIt = repository.getPageIterator(moduleNum, lessonNum)
-        pageIt.setIndex(pageNum)
+            pageIt = repository.getPageIterator(moduleNum, lessonNum)
+            pageIt.setIndex(pageNum)
+        }
     }
 }
