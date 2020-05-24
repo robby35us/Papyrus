@@ -5,10 +5,10 @@ import com.robertreed.papyrusarabic.repository.LocationData
 import com.robertreed.papyrusarabic.repository.LocationDataNavigator
 import com.robertreed.papyrusarabic.repository.MODULE_PAGE_NUM_OFFSET
 
-class MainViewModel(private var farthestLocation: LocationData,
-                    startLocation: LocationData = LocationData(0,0,0))
-    : ViewModel() {
+class MainViewModel() : ViewModel() {
 
+    private var startLocation = LocationData(0,0,0)
+    private var farthestLocation = LocationData(0,0,0)
     private val navigator = LocationDataNavigator(startLocation)
 
     fun atFarthestLocationReached() = compare(navigator.getLocation(), farthestLocation) == 0
