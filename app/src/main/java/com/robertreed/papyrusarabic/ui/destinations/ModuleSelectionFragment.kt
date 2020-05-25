@@ -12,6 +12,7 @@ import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import com.robertreed.papyrusarabic.R
 import com.robertreed.papyrusarabic.ui.MainViewModel
@@ -33,55 +34,52 @@ class ModuleSelectionFragment : Fragment() {
     ): View? {
         val view = inflater.inflate(R.layout.fragment_module_selection, container, false)
 
-        val page = viewModel.getCurrentPage()
-
-        // load module card content
-
         cardView = view.findViewById(R.id.module_card)
-        if(!viewModel.moduleSelectionAvailable()) {
-            cardView.setCardBackgroundColor(ContextCompat.getColor(requireContext(),
-                R.color.colorDisabled
-            ))
-        }
 
         context  = view.findViewById(R.id.context)
-        context.text = page.number.toString()
-
         header = view.findViewById(R.id.header)
-        header.text = page.header
-
         subHeader = view.findViewById(R.id.sub_header)
-        subHeader.text = page.sub_header
 
-        // load navigation content
         gotoButton = view.findViewById((R.id.goto_button))
-        if (viewModel.moduleSelectionAvailable()){
-            gotoButton.setText(R.string.start_module)
-            gotoButton.setOnClickListener {
-                viewModel.navIntoModule()
-                findNavController().navigate(R.id.action_moduleSelectionFragment_to_moduleContentFragment)
-            }
+        gotoButton.isEnabled = false
+        gotoButton.setOnClickListener {
+            viewModel.navIntoModule()
+            findNavController().navigate(R.id.action_moduleSelectionFragment_to_moduleContentFragment)
         }
 
         navLeft = view.findViewById(R.id.nav_left)
+        navLeft.isEnabled = false
         navLeft.setOnClickListener {
             viewModel.navToPrevPage()
             findNavController().navigateUp()
         }
 
         navRight = view.findViewById(R.id.nav_right)
-        if(viewModel.hasNextPage()) {
-            navRight.isEnabled = true
-            navRight.visibility = View.VISIBLE
-            navRight.setOnClickListener {
-                viewModel.navToNextPage()
-                findNavController().navigate(R.id.action_moduleSelectionFragment_self)
+        navRight.isEnabled = false
+        navRight.setOnClickListener {
+            viewModel.navToNextPage()
+            findNavController().navigate(R.id.action_moduleSelectionFragment_self)
+        }
+
+        val pageLiveData = viewModel.currentPage()
+        pageLiveData.observe(viewLifecycleOwner, Observer { page ->
+            context.text = page?.number.toString()
+            header.text = page?.header
+            subHeader.text = page?.sub_header
+
+            if(viewModel.moduleSelectionAvailable()) {
+                gotoButton.isEnabled = true
+                gotoButton.setText(R.string.start_module)
+            } else {
+                cardView.setCardBackgroundColor(ContextCompat.getColor(requireContext(),
+                    R.color.colorDisabled
+                ))
             }
-        }
-        else {
-            navRight.isEnabled = false
-            navRight.visibility = View.INVISIBLE
-        }
+
+            if(viewModel.hasNextPage())
+                navRight.isEnabled = true
+        })
+
         return view
     }
 }

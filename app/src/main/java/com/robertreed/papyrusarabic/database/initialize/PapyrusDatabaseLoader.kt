@@ -65,7 +65,7 @@ class PapyrusDatabaseLoader : AppCompatActivity() {
             moduleUUIDList.add(module.id)
             GlobalScope.launch {
                 repository.insertModule(module)
-                Log.i("INSERT_MODULES", repository.getModule(module.id)!!.toString())
+                //Log.i("INSERT_MODULES", repository.getModule(module.id)!!.toString())
             }
         }
         return moduleUUIDList
@@ -87,7 +87,7 @@ class PapyrusDatabaseLoader : AppCompatActivity() {
             lessonUUIDArray.append(moduleNumber * 10 + lessonNumber, lesson.id)
             GlobalScope.launch {
                 repository.insertLesson(lesson)
-                Log.i("INSERT_LESSONS", repository.getLesson(lesson.id)!!.toString())
+                //Log.i("INSERT_LESSONS", repository.getLesson(lesson.id)!!.toString())
             }
         }
         return lessonUUIDArray
@@ -103,7 +103,7 @@ class PapyrusDatabaseLoader : AppCompatActivity() {
             pageTypeUUIDArray.add(pageType.id)
             GlobalScope.launch {
                 repository.insertPageType(pageType)
-                Log.i("INSERT_PAGE_TYPES", repository.getPageType(pageType.id)!!.toString())
+                //Log.i("INSERT_PAGE_TYPES", repository.getPageType(pageType.id)!!.toString())
             }
         }
         return pageTypeUUIDArray
@@ -120,7 +120,7 @@ class PapyrusDatabaseLoader : AppCompatActivity() {
             imageUUIDList.add(image.id)
             GlobalScope.launch {
                 repository.insertImage(image)
-                Log.i("INSERT_IMAGES", repository.getImage(image.id)!!.toString())
+                //Log.i("INSERT_IMAGES", repository.getImage(image.id)!!.toString())
             }
         }
         return imageUUIDList
@@ -161,7 +161,7 @@ class PapyrusDatabaseLoader : AppCompatActivity() {
             )
             GlobalScope.launch {
                 repository.insertPage(page)
-                Log.i("INSERT_PAGES", repository.getPage(page.id)!!.toString())
+                //Log.i("INSERT_PAGES", repository.getPage(page.id)!!.toString())
             }
         }
     }

@@ -1,5 +1,6 @@
 package com.robertreed.papyrusarabic.database
 
+import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
@@ -10,10 +11,10 @@ import java.util.*
 interface PageTypeDao {
 
     @Query("SELECT * FROM pagetype WHERE id=(:id)")
-    fun getPageType(id: UUID): PageType
+    fun getPageType(id: UUID): LiveData<PageType>
 
     @Query("SELECT * FROM pagetype")
-    fun getPageTypes(): List<PageType>
+    fun getPageTypes(): LiveData<List<PageType>>
 
     @Insert
     fun insert(pageType: PageType)

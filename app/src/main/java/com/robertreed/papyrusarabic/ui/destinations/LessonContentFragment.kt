@@ -10,6 +10,7 @@ import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.TextView
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import com.robertreed.papyrusarabic.R
 import com.robertreed.papyrusarabic.ui.MainViewModel
@@ -32,27 +33,37 @@ class LessonContentFragment : Fragment() {
     ): View? {
         val view = inflater.inflate(R.layout.fragment_lesson_content, container, false)
 
-        val page = viewModel.getCurrentPage()
+        val pageLiveData = viewModel.currentPage()
 
 
         context = view.findViewById(R.id.context)
-        context.text = page.number.toString()
+        pageLiveData.observe(viewLifecycleOwner, Observer {
+                page -> context.text = page?.number.toString()
+        })
 
         header = view.findViewById(R.id.header)
-        header.text = page.header
+        pageLiveData.observe(viewLifecycleOwner, Observer {
+                page -> header.text = page?.header
+        })
 
         content1 = view.findViewById(R.id.content1)
-        content1.text = page.content1
+        pageLiveData.observe(viewLifecycleOwner, Observer {
+                page -> content1.text = page?.content1
+        })
 
         content2 = view.findViewById(R.id.content2)
-        content2.text = page.content2
+        pageLiveData.observe(viewLifecycleOwner, Observer {
+                page -> content2.text = page?.content2
+        })
 
         content3 = view.findViewById(R.id.content3)
-        content3.text = page.content3
+        pageLiveData.observe(viewLifecycleOwner, Observer {
+                page -> content3.text = page?.content3
+        })
 
         navLeft = view.findViewById(R.id.nav_left)
         navLeft.setOnClickListener {
-            if(viewModel.hasPrevPage())
+            if(viewModel.hasPrevPage() == true)
                 viewModel.navToPrevPage()
             else
                 viewModel.navOutOfLesson()
@@ -61,14 +72,14 @@ class LessonContentFragment : Fragment() {
 
         navRight = view.findViewById(R.id.nav_right)
         navRight.setOnClickListener {
-            if (viewModel.hasNextPage()) {
+            if (viewModel.hasNextPage() == true) {
                 //viewModel.navToNextPage()
                 //findNavController().navigate(R.id.l)
             } else {
                 viewModel.markLessonComplete()
                 val numPagesToPop = viewModel.numPagesInLesson()
                 viewModel.navOutOfLesson()
-                for (i in 0 until numPagesToPop)
+                for (i in 0 until numPagesToPop!!)
                     findNavController().popBackStack()
             }
         }

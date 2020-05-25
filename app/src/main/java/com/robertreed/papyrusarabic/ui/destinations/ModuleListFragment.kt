@@ -11,14 +11,17 @@ import android.widget.*
 import androidx.navigation.fragment.findNavController
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.Observer
 import com.robertreed.papyrusarabic.R
+import com.robertreed.papyrusarabic.model.Page
 import com.robertreed.papyrusarabic.ui.MainViewModel
-
 
 class ModuleListFragment : Fragment() {
 
     private val viewModel: MainViewModel by activityViewModels()
 
+    private lateinit var pageLiveData: LiveData<Page>
     private lateinit var context: TextView
     private lateinit var header: TextView
     private lateinit var subHeader: TextView
@@ -35,37 +38,38 @@ class ModuleListFragment : Fragment() {
 
         val view = inflater.inflate(R.layout.fragment_module_list, container, false)
 
-        val page = viewModel.getCurrentPage()
-
         context = view.findViewById(R.id.context)
-        context.text = page.number.toString()
-
         header = view.findViewById(R.id.header)
-        header.text = page.header
-
         subHeader = view.findViewById(R.id.sub_header)
-        subHeader.text = page.sub_header
-
-
-        adapter = ContentListAdapter(arrayOf(page.content1!!, page.content2!!, page.content3!!))
-
-        contentList = view.findViewById(R.id.content_list)
-        contentList.adapter = adapter
-        contentList.isEnabled = false
 
         navLeft = view.findViewById(R.id.nav_left)
+        navLeft.isEnabled = false
         navLeft.setOnClickListener {
             viewModel.navToPrevPage()
             findNavController().navigateUp()
         }
 
         navRight = view.findViewById(R.id.nav_right)
+        navRight.isEnabled = false
+        navRight.visibility = View.INVISIBLE
         navRight.setOnClickListener {
             viewModel.navToNextPage()
             findNavController().navigate(R.id.action_moduleListFragment_to_lessonSelectionFragment)
         }
-        navRight.isEnabled = false
-        navRight.visibility = View.INVISIBLE
+
+        adapter = ContentListAdapter()
+
+        contentList = view.findViewById(R.id.content_list)
+        contentList.adapter = adapter
+        contentList.isEnabled = false
+
+        pageLiveData = viewModel.currentPage()
+        pageLiveData.observe(viewLifecycleOwner, Observer { page ->
+            context.text = page?.number.toString()
+            header.text = page?.header
+            subHeader.text = page?.sub_header
+            navLeft.isEnabled = true
+        })
 
         return view
     }
@@ -78,44 +82,45 @@ class ModuleListFragment : Fragment() {
             navRight.isEnabled = true
         }
         else {
-            var index = 0
+            pageLiveData.observe(viewLifecycleOwner, Observer {
+                var index = 0
 
-            val animation = AnimationUtils.makeInChildBottomAnimation(requireContext())
-            animation.duration = 1000
-            animation.setAnimationListener(object: Animation.AnimationListener{
-                override fun onAnimationRepeat(animation: Animation?) {
-                    // left blank
-                }
-
-                override fun onAnimationEnd(animation: Animation?) {
-
-                    if(index < adapter.count - 1) {
-                        index += 1
-                        Handler().postDelayed({
-                            (adapter.getItem(index) as View).visibility = View.VISIBLE
-                            (adapter.getItem(index) as View).startAnimation(animation)
-                        }, 500)
+                val animation = AnimationUtils.makeInChildBottomAnimation(requireContext())
+                animation.duration = 1000
+                animation.setAnimationListener(object : Animation.AnimationListener {
+                    override fun onAnimationRepeat(animation: Animation?) {
+                        // left blank
                     }
-                    else {
-                        navRight.isEnabled = true
-                        navRight.visibility = View.VISIBLE
+
+                    override fun onAnimationEnd(animation: Animation?) {
+
+                        if (index < adapter.count - 1) {
+                            index += 1
+                            Handler().postDelayed({
+                                (adapter.getItem(index) as View).visibility = View.VISIBLE
+                                (adapter.getItem(index) as View).startAnimation(animation)
+                            }, 500)
+                        } else {
+                            navRight.isEnabled = true
+                            navRight.visibility = View.VISIBLE
+                        }
                     }
-                }
 
-                override fun onAnimationStart(animation: Animation?) {
-                    // left blank
-                }
+                    override fun onAnimationStart(animation: Animation?) {
+                        // left blank
+                    }
 
+                })
+
+                Handler().postDelayed({
+                    (adapter.getItem(index) as View).visibility = View.VISIBLE
+                    (adapter.getItem(index) as View).startAnimation(animation)
+                }, 500)
             })
-
-            Handler().postDelayed({
-                (adapter.getItem(index) as View).visibility = View.VISIBLE
-                (adapter.getItem(index) as View).startAnimation(animation)
-            }, 500)
         }
     }
 
-    private inner class ContentListAdapter(private val listItems: Array<String>) : BaseAdapter() {
+    private inner class ContentListAdapter : BaseAdapter() {
         private var textViews = arrayListOf<View>()
 
         override fun getItem(position: Int): Any {
@@ -127,7 +132,7 @@ class ModuleListFragment : Fragment() {
         }
 
         override fun getCount(): Int {
-            return listItems.size
+            return 3
         }
 
         override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
@@ -136,7 +141,14 @@ class ModuleListFragment : Fragment() {
             else
                 textViews.add(convertView)
             val textView = textViews[position].findViewById<TextView>(R.id.content)
-            textView?.text = listItems[position]
+            pageLiveData.observe(viewLifecycleOwner, Observer {
+                    page -> textView.text = when (position) {
+                        0 -> page?.content1
+                        1 -> page?.content2
+                        2 -> page?.content3
+                        else -> throw ArrayIndexOutOfBoundsException()
+                    }
+            })
             return textViews[position]
         }
     }

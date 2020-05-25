@@ -19,13 +19,13 @@ import java.util.*
                    Index(value = ["image"], name = "page_image_index"),
                    Index(value = ["pageType"], name = "page_page_type_index")])
 data class Page(@PrimaryKey val id: UUID = UUID.randomUUID(),
-                var lessonId: UUID,
-                var number: Int,
-                var image: UUID,
-                var header: String?,
-                var sub_header: String?,
-                var content1: String?,
-                var content2: String?,
-                var content3: String?,
-                var pageType: UUID
+                var lessonId: UUID? = null,
+                var number: Int = 0,
+                var image: UUID? = null,
+                var header: String? = "",
+                var sub_header: String? = "",
+                var content1: String? = "",
+                var content2: String? = "",
+                var content3: String? = "",
+                var pageType: UUID? = null
 )

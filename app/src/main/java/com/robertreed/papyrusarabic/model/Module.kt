@@ -6,7 +6,7 @@ import java.util.*
 
 @Entity
 data class Module(@PrimaryKey val id: UUID = UUID.randomUUID(),
-                  val number: Int,
-                  val title: String,
-                  val shortTitle: String,
-                  val description: String)
+                  val number: Int = 0,
+                  val title: String = "",
+                  val shortTitle: String = "",
+                  val description: String = "")

@@ -8,6 +8,7 @@ import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import com.robertreed.papyrusarabic.R
 import com.robertreed.papyrusarabic.ui.MainViewModel
@@ -29,13 +30,25 @@ class SplashScreen: Fragment(), View.OnClickListener {
         val view = inflater.inflate(R.layout.fragment_splash_screen, container, false)
 
         screen = view.findViewById(R.id.splash_screen)
+        screen.isEnabled = false
         screen.setOnClickListener(this)
 
         titleView = view.findViewById(R.id.title_text)
+        titleView.isEnabled = false
         titleView.setOnClickListener(this)
 
         subtitleView = view.findViewById(R.id.subtitle_text)
+        subtitleView.isEnabled = false
         subtitleView.setOnClickListener(this)
+
+        val pageLiveData = viewModel.currentPage()
+        pageLiveData.observe(viewLifecycleOwner, Observer { page ->
+            if (page.lessonId != null) {
+                screen.isEnabled = true
+                titleView.isEnabled = true
+                subtitleView.isEnabled = true
+            }
+        })
 
         return view
     }

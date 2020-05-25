@@ -1,5 +1,6 @@
 package com.robertreed.papyrusarabic.database
 
+import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
@@ -10,13 +11,13 @@ import java.util.*
 interface ModuleDao {
 
     @Query("SELECT * FROM module WHERE id=(:id)")
-    fun getModule(id: UUID): Module?
+    fun getModule(id: UUID): LiveData<Module?>
 
     @Query("SELECT * FROM module WHERE number=(:number)")
-    fun getModuleByNumber(number: Int) : Module?
+    fun getModuleByNumber(number: Int) : LiveData<Module?>
 
     @Query("SELECT * FROM module ORDER BY number")
-    fun getModules(): List<Module>
+    fun getModules(): LiveData<List<Module>>
 
     @Insert
     fun insert(module: List<Module>)
