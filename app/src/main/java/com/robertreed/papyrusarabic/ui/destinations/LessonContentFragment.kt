@@ -63,7 +63,7 @@ class LessonContentFragment : Fragment() {
 
         navLeft = view.findViewById(R.id.nav_left)
         navLeft.setOnClickListener {
-            if(viewModel.hasPrevPage() == true)
+            if(viewModel.hasPrevPage())
                 viewModel.navToPrevPage()
             else
                 viewModel.navOutOfLesson()
@@ -72,14 +72,14 @@ class LessonContentFragment : Fragment() {
 
         navRight = view.findViewById(R.id.nav_right)
         navRight.setOnClickListener {
-            if (viewModel.hasNextPage() == true) {
+            if (viewModel.hasNextPage()) {
                 //viewModel.navToNextPage()
-                //findNavController().navigate(R.id.l)
+                //findNavController().navigate(R.id.)
             } else {
                 viewModel.markLessonComplete()
                 val numPagesToPop = viewModel.numPagesInLesson()
                 viewModel.navOutOfLesson()
-                for (i in 0 until numPagesToPop!!)
+                for (i in 0 until numPagesToPop)
                     findNavController().popBackStack()
             }
         }

@@ -13,6 +13,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import com.robertreed.papyrusarabic.R
+import com.robertreed.papyrusarabic.ui.LESSON_PAGE_NUM_OFFSET
 import com.robertreed.papyrusarabic.ui.MainViewModel
 
 class ModuleContentFragment : Fragment() {
@@ -37,43 +38,40 @@ class ModuleContentFragment : Fragment() {
         val pageLiveData = viewModel.currentPage()
 
         context = view.findViewById(R.id.context)
-        pageLiveData.observe(viewLifecycleOwner, Observer {
-                page -> context.text = page?.number.toString()
-        })
-
         header = view.findViewById(R.id.header)
-        pageLiveData.observe(viewLifecycleOwner, Observer {
-                page -> header.text = page?.header
-        })
-
         content1 = view.findViewById(R.id.content1)
-        pageLiveData.observe(viewLifecycleOwner, Observer {
-                page -> content1.text = page?.content1
-        })
-
         content2 = view.findViewById(R.id.content2)
-        pageLiveData.observe(viewLifecycleOwner, Observer {
-                page -> content2.text = page?.content2
-        })
-
         content3 = view.findViewById(R.id.content3)
-        pageLiveData.observe(viewLifecycleOwner, Observer {
-                page -> content3.text = page?.content3
-        })
 
         navLeft = view.findViewById(R.id.nav_left)
+        navLeft.isEnabled = false
         navLeft.setOnClickListener {
             viewModel.navOutOfModule()
             findNavController().navigateUp()
         }
 
         navRight = view.findViewById(R.id.nav_right)
-        navRight.setOnClickListener {
-            viewModel.navToNextPage()
-            findNavController().navigate(R.id.action_moduleContentFragment_to_moduleListFragment)
-        }
-        navRight.visibility = View.INVISIBLE
         navRight.isEnabled = false
+        navRight.visibility = View.INVISIBLE
+        navRight.setOnClickListener {
+            val pageNum = viewModel.currentPage().value!!.number
+            viewModel.navToNextPage()
+            if(pageNum < LESSON_PAGE_NUM_OFFSET)
+                findNavController().navigate(R.id.action_moduleContentFragment_to_moduleListFragment)
+            else {
+                findNavController().popBackStack(R.id.moduleSelectionFragment, false)
+                findNavController().navigate(R.id.action_moduleSelectionFragment_self)
+            }
+        }
+
+        pageLiveData.observe(viewLifecycleOwner, Observer { page ->
+            context.text = page?.number.toString()
+            header.text = page?.header
+            content1.text = page?.content1
+            content2.text = page?.content2
+            content3.text = page?.content3
+            navLeft.isEnabled = true
+        })
 
         return view
     }

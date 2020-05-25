@@ -15,6 +15,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import com.robertreed.papyrusarabic.R
 import com.robertreed.papyrusarabic.model.Page
+import com.robertreed.papyrusarabic.ui.LESSON_PAGE_NUM_OFFSET
 import com.robertreed.papyrusarabic.ui.MainViewModel
 
 class ModuleListFragment : Fragment() {
@@ -53,8 +54,12 @@ class ModuleListFragment : Fragment() {
         navRight.isEnabled = false
         navRight.visibility = View.INVISIBLE
         navRight.setOnClickListener {
+            val pageNum = viewModel.currentPage().value!!.number
             viewModel.navToNextPage()
-            findNavController().navigate(R.id.action_moduleListFragment_to_lessonSelectionFragment)
+            if(pageNum < LESSON_PAGE_NUM_OFFSET)
+                findNavController().navigate(R.id.action_moduleListFragment_to_lessonSelectionFragment)
+            else
+                findNavController().navigate(R.id.action_moduleListFragment_to_moduleContentFragment)
         }
 
         adapter = ContentListAdapter()

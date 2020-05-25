@@ -33,11 +33,11 @@ class SplashScreen: Fragment(), View.OnClickListener {
         screen.isEnabled = false
         screen.setOnClickListener(this)
 
-        titleView = view.findViewById(R.id.title_text)
+        titleView = view.findViewById(R.id.header)
         titleView.isEnabled = false
         titleView.setOnClickListener(this)
 
-        subtitleView = view.findViewById(R.id.subtitle_text)
+        subtitleView = view.findViewById(R.id.sub_header)
         subtitleView.isEnabled = false
         subtitleView.setOnClickListener(this)
 

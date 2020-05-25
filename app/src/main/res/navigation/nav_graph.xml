@@ -63,6 +63,13 @@
             app:exitAnim="@anim/slide_out_left"
             app:popEnterAnim="@anim/slide_in_left"
             app:popExitAnim="@anim/slide_out_right" />
+        <action
+            android:id="@+id/action_moduleListFragment_to_moduleContentFragment"
+            app:destination="@id/moduleContentFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
     </fragment>
     <fragment
         android:id="@+id/lessonSelectionFragment"
@@ -83,6 +90,13 @@
             app:exitAnim="@anim/push_up_out"
             app:popEnterAnim="@anim/push_down_in"
             app:popExitAnim="@anim/push_down_out" />
+        <action
+            android:id="@+id/action_lessonSelectionFragment_to_moduleListFragment"
+            app:destination="@id/moduleListFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
     </fragment>
     <fragment
         android:id="@+id/lessonContentFragment"

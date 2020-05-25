@@ -10,15 +10,18 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import com.robertreed.papyrusarabic.R
+import com.robertreed.papyrusarabic.ui.LESSON_PAGE_NUM_OFFSET
 import com.robertreed.papyrusarabic.ui.MainViewModel
+import com.robertreed.papyrusarabic.ui.NUM_LESSONS_PER_MODULE
 
 class LessonSelectionFragment : Fragment() {
 
     private val viewModel : MainViewModel by activityViewModels()
 
     private lateinit var context: TextView
+    private lateinit var item: View
     private lateinit var starImage: ImageView
-    private lateinit var header: TextView
+    private lateinit var content: TextView
     private lateinit var subHeader: TextView
     private lateinit var gotoButton: Button
     private lateinit var navLeft: ImageButton
@@ -31,10 +34,14 @@ class LessonSelectionFragment : Fragment() {
         // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_lesson_selection, container, false)
 
-        val pageLiveData = viewModel.currentPage()
-
         context = view.findViewById(R.id.context)
-        header = view.findViewById(R.id.header)
+
+        item = view.findViewById(R.id.item)
+        item.visibility = View.VISIBLE
+
+        starImage = item.findViewById(R.id.star_image)
+        content = item.findViewById(R.id.content)
+
         subHeader = view.findViewById(R.id.sub_header)
 
         navLeft = view.findViewById(R.id.nav_left)
@@ -54,24 +61,30 @@ class LessonSelectionFragment : Fragment() {
         navRight = view.findViewById(R.id.nav_right)
         navRight.isEnabled = false
         navRight.setOnClickListener {
+            val pageNum = viewModel.currentPage().value!!.number
             viewModel.navToNextPage()
-            findNavController().navigate(R.id.action_lessonSelectionFragment_self)
+            if(pageNum < LESSON_PAGE_NUM_OFFSET + NUM_LESSONS_PER_MODULE - 1)
+                findNavController().navigate(R.id.action_lessonSelectionFragment_self)
+            else
+                findNavController().navigate(R.id.action_lessonSelectionFragment_to_moduleListFragment)
         }
 
+        val pageLiveData = viewModel.currentPage()
         pageLiveData.observe(viewLifecycleOwner, Observer { page ->
             context.text = page?.number.toString()
-            header.text = page?.header
+            content.text = page?.header
             subHeader.text = page?.sub_header
 
             navLeft.isEnabled = true
             navRight.isEnabled = viewModel.hasNextPage()
 
             if(viewModel.isLessonCompleted()) {
-                starImage = view.findViewById(R.id.star_image)
                 starImage.setImageResource(android.R.drawable.btn_star_big_on)
                 gotoButton.setText(R.string.restart_lesson)
-            } else
+            } else {
                 gotoButton.setText(R.string.start_lesson)
+                starImage.setImageResource(android.R.drawable.btn_star_big_off)
+            }
         })
         return view
     }

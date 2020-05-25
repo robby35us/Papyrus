@@ -2,6 +2,7 @@ package com.robertreed.papyrusarabic.repository
 
 import android.content.Context
 import android.util.SparseArray
+import androidx.core.util.set
 import androidx.room.Room
 import com.robertreed.papyrusarabic.database.PapyrusDatabase
 import com.robertreed.papyrusarabic.model.*
@@ -39,12 +40,12 @@ class PapyrusRepository private constructor(context: Context){
     fun getLessonIterator(moduleIndex: Int): LessonIterator {
         if(!moduleIt.isLoaded())
             throw IllegalAccessError()
-        if(lessonIteratorArray.valueAt(moduleIndex) == null) {
+        if(lessonIteratorArray[moduleIndex, null] == null) {
             val moduleId = moduleIt.get(moduleIndex).id
             val iterator = LessonIterator(lessonDao.getLessonsByModuleId(moduleId))
-            lessonIteratorArray.setValueAt(moduleIndex, iterator)
+            lessonIteratorArray[moduleIndex] = iterator
         }
-        return lessonIteratorArray.valueAt(moduleIndex)
+        return lessonIteratorArray[moduleIndex]
     }
 
     fun getPageIterator(moduleIndex: Int, lessonIndex: Int): PageIterator {
@@ -54,13 +55,13 @@ class PapyrusRepository private constructor(context: Context){
 
         val pageOffset = moduleIndex * MODULE_NUM_OFFSET + lessonIndex
 
-        if(pageIteratorArray.valueAt(pageOffset) == null) {
+        if(pageIteratorArray[pageOffset, null] == null) {
             val lessonId = lessonIt.get(lessonIndex).id
             val pageIt = PageIterator(pageDao.getPagesByLessonID(lessonId))
-            pageIteratorArray.setValueAt(pageOffset, pageIt)
+            pageIteratorArray[pageOffset] = pageIt
         }
 
-        return pageIteratorArray.valueAt(pageOffset)
+        return pageIteratorArray[pageOffset]
     }
 
     fun insertModule(module: Module) {
