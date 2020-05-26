@@ -135,7 +135,7 @@ class PapyrusDatabaseLoader : AppCompatActivity() {
             val page = Page(
                 lessonId = lessonIds.get(moduleNumber * 10 + lessonNumber),
                 number = row.getCell(2).numericCellValue.toInt(),
-                pageType = pageTypeIds[row.getCell(3).numericCellValue.toInt() - 1],
+                pageType = pageTypeIds[row.getCell(3).numericCellValue.toInt()],
                 header = if(row.getCell(4)?.cellType == Cell.CELL_TYPE_STRING)
                     row.getCell(4).stringCellValue
                 else

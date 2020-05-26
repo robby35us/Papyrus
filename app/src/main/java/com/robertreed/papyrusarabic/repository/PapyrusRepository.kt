@@ -9,6 +9,7 @@ import com.robertreed.papyrusarabic.model.*
 import com.robertreed.papyrusarabic.repository.iterators.LessonIterator
 import com.robertreed.papyrusarabic.repository.iterators.ModuleIterator
 import com.robertreed.papyrusarabic.repository.iterators.PageIterator
+import com.robertreed.papyrusarabic.repository.iterators.PageTypes
 import java.util.*
 
 private const val DATABASE_NAME = "papyrus-database"
@@ -30,10 +31,13 @@ class PapyrusRepository private constructor(context: Context){
     private var moduleIt = ModuleIterator(moduleDao.getModules())
     private var lessonIteratorArray = SparseArray<LessonIterator>()
     private val pageIteratorArray = SparseArray<PageIterator>()
+    private val pageTypes = PageTypes(pageTypeDao.getPageTypes())
 
     fun clearDatabase() {
         database.clearAllTables()
     }
+
+    fun getPageTypes() = pageTypes
 
     fun getModuleIterator() = moduleIt
 

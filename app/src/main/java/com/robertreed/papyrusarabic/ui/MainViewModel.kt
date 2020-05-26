@@ -6,7 +6,6 @@ import com.robertreed.papyrusarabic.model.Page
 import com.robertreed.papyrusarabic.repository.LocationData
 import com.robertreed.papyrusarabic.repository.PapyrusRepository
 import com.robertreed.papyrusarabic.repository.iterators.LessonIterator
-import com.robertreed.papyrusarabic.repository.iterators.ModuleIterator
 import com.robertreed.papyrusarabic.repository.iterators.PageIterator
 
 const val LESSON_PAGE_NUM_OFFSET = 2
@@ -17,9 +16,10 @@ const val NUM_LESSONS_PER_MODULE = 3
 class MainViewModel : ViewModel() {
 
     private val repository = PapyrusRepository.get()
-    private var moduleIt: ModuleIterator = repository.getModuleIterator()
+    private var moduleIt = repository.getModuleIterator()
     private var lessonIt = LessonIterator(MutableLiveData(listOf()))
     private var pageIt = PageIterator(MutableLiveData(listOf()))
+    private var pageTypes = repository.getPageTypes()
 
     private var currentLocation = LocationData()
     private var farthestLocation = LocationData()
@@ -37,6 +37,8 @@ class MainViewModel : ViewModel() {
     fun atFarthestLocationReached() = compare(currentLocation, farthestLocation) == 0
 
     fun currentPage() = pageData
+
+    fun getCurrentPageTypeName() = pageTypes.get(pageData.value!!.pageType!!).name
 
     fun hasNextLesson() = lessonIt.hasNext()
 

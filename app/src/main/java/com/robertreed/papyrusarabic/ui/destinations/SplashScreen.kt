@@ -55,6 +55,10 @@ class SplashScreen: Fragment(), View.OnClickListener {
 
     override fun onClick(v: View?) {
         viewModel.navToNextPage()
-        findNavController().navigate(R.id.action_splashScreen_to_moduleSelectionFragment)
+        requireActivity().supportFragmentManager.popBackStack()
+    }
+
+    companion object {
+        fun newInstance() = SplashScreen()
     }
 }

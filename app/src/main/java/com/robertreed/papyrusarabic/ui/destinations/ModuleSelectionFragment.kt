@@ -44,21 +44,21 @@ class ModuleSelectionFragment : Fragment() {
         gotoButton.isEnabled = false
         gotoButton.setOnClickListener {
             viewModel.navIntoModule()
-            findNavController().navigate(R.id.action_moduleSelectionFragment_to_moduleContentFragment)
+            requireActivity().supportFragmentManager.popBackStack()
         }
 
         navLeft = view.findViewById(R.id.nav_left)
         navLeft.isEnabled = false
         navLeft.setOnClickListener {
             viewModel.navToPrevPage()
-            findNavController().navigateUp()
+            requireActivity().supportFragmentManager.popBackStack()
         }
 
         navRight = view.findViewById(R.id.nav_right)
         navRight.isEnabled = false
         navRight.setOnClickListener {
             viewModel.navToNextPage()
-            findNavController().navigate(R.id.action_moduleSelectionFragment_self)
+            requireActivity().supportFragmentManager.popBackStack()
         }
 
         val pageLiveData = viewModel.currentPage()
@@ -81,5 +81,9 @@ class ModuleSelectionFragment : Fragment() {
         })
 
         return view
+    }
+
+    companion object {
+        fun newInstance() = ModuleSelectionFragment()
     }
 }

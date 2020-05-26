@@ -11,7 +11,6 @@ import android.widget.ImageButton
 import android.widget.TextView
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
-import androidx.navigation.fragment.findNavController
 import com.robertreed.papyrusarabic.R
 import com.robertreed.papyrusarabic.ui.MainViewModel
 
@@ -67,21 +66,13 @@ class LessonContentFragment : Fragment() {
                 viewModel.navToPrevPage()
             else
                 viewModel.navOutOfLesson()
-            findNavController().navigateUp()
+            requireActivity().supportFragmentManager.popBackStack()
         }
 
         navRight = view.findViewById(R.id.nav_right)
         navRight.setOnClickListener {
-            if (viewModel.hasNextPage()) {
-                //viewModel.navToNextPage()
-                //findNavController().navigate(R.id.)
-            } else {
-                viewModel.markLessonComplete()
-                val numPagesToPop = viewModel.numPagesInLesson()
-                viewModel.navOutOfLesson()
-                for (i in 0 until numPagesToPop)
-                    findNavController().popBackStack()
-            }
+            viewModel.navToNextPage()
+            requireActivity().supportFragmentManager.popBackStack()
         }
         navRight.visibility = View.INVISIBLE
         navRight.isEnabled = false
@@ -121,4 +112,7 @@ class LessonContentFragment : Fragment() {
         }
     }
 
+    companion object {
+        fun newInstance() = LessonContentFragment()
+    }
 }

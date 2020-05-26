@@ -47,7 +47,7 @@ class ModuleListFragment : Fragment() {
         navLeft.isEnabled = false
         navLeft.setOnClickListener {
             viewModel.navToPrevPage()
-            findNavController().navigateUp()
+            requireActivity().supportFragmentManager.popBackStack()
         }
 
         navRight = view.findViewById(R.id.nav_right)
@@ -56,10 +56,7 @@ class ModuleListFragment : Fragment() {
         navRight.setOnClickListener {
             val pageNum = viewModel.currentPage().value!!.number
             viewModel.navToNextPage()
-            if(pageNum < LESSON_PAGE_NUM_OFFSET)
-                findNavController().navigate(R.id.action_moduleListFragment_to_lessonSelectionFragment)
-            else
-                findNavController().navigate(R.id.action_moduleListFragment_to_moduleContentFragment)
+            requireActivity().supportFragmentManager.popBackStack()
         }
 
         adapter = ContentListAdapter()
@@ -156,5 +153,9 @@ class ModuleListFragment : Fragment() {
             })
             return textViews[position]
         }
+    }
+
+    companion object {
+        fun newInstance() = ModuleListFragment()
     }
 }

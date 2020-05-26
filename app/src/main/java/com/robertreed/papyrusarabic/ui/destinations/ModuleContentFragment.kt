@@ -47,21 +47,15 @@ class ModuleContentFragment : Fragment() {
         navLeft.isEnabled = false
         navLeft.setOnClickListener {
             viewModel.navOutOfModule()
-            findNavController().navigateUp()
+            requireActivity().supportFragmentManager.popBackStack()
         }
 
         navRight = view.findViewById(R.id.nav_right)
         navRight.isEnabled = false
         navRight.visibility = View.INVISIBLE
         navRight.setOnClickListener {
-            val pageNum = viewModel.currentPage().value!!.number
             viewModel.navToNextPage()
-            if(pageNum < LESSON_PAGE_NUM_OFFSET)
-                findNavController().navigate(R.id.action_moduleContentFragment_to_moduleListFragment)
-            else {
-                findNavController().popBackStack(R.id.moduleSelectionFragment, false)
-                findNavController().navigate(R.id.action_moduleSelectionFragment_self)
-            }
+            requireActivity().supportFragmentManager.popBackStack()
         }
 
         pageLiveData.observe(viewLifecycleOwner, Observer { page ->
@@ -106,5 +100,9 @@ class ModuleContentFragment : Fragment() {
                 navRight.isEnabled = true
             }, 7000)
         }
+    }
+
+    companion object {
+        fun newInstance() = ModuleContentFragment()
     }
 }
