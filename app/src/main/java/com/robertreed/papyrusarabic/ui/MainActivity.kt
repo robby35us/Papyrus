@@ -17,7 +17,6 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
         val currentFragment =
             supportFragmentManager.findFragmentById(R.id.fragment_container)
 
@@ -25,26 +24,13 @@ class MainActivity : AppCompatActivity() {
             val pageLiveData = viewModel.currentPage()
             pageLiveData.observe(this, Observer {page ->
                 if(page.pageType != null) {
-                    val fragment = fragmentSelector(viewModel.getCurrentPageTypeName())
+                    val fragment = viewModel.fragmentSelector()
                     supportFragmentManager
                         .beginTransaction()
                         .add(R.id.fragment_container, fragment)
                         .commit()
                 }
             })
-        }
-    }
-
-    private fun fragmentSelector(name:String): Fragment {
-        return when (name) {
-            "splash" -> SplashScreen.newInstance()
-            "moduleSelection" -> ModuleSelectionFragment.newInstance()
-            "moduleContent" -> ModuleContentFragment.newInstance()
-            "moduleList" -> ModuleListFragment.newInstance()
-            "lessonSelection" -> LessonSelectionFragment.newInstance()
-            "lessonContent" -> LessonContentFragment.newInstance()
-            "lessonImage" -> LessonImageFragment.newInstance()
-            else -> SplashScreen.newInstance()
         }
     }
 }

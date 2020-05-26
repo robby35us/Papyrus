@@ -1,16 +1,27 @@
 package com.robertreed.papyrusarabic.ui
 
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.robertreed.papyrusarabic.R
 import com.robertreed.papyrusarabic.model.Page
 import com.robertreed.papyrusarabic.repository.LocationData
 import com.robertreed.papyrusarabic.repository.PapyrusRepository
 import com.robertreed.papyrusarabic.repository.iterators.LessonIterator
 import com.robertreed.papyrusarabic.repository.iterators.PageIterator
+import com.robertreed.papyrusarabic.ui.destinations.*
 
 const val LESSON_PAGE_NUM_OFFSET = 2
 const val MODULE_PAGE_NUM_OFFSET = 0
 const val NUM_LESSONS_PER_MODULE = 3
+const val FRAGMENT_CONTAINER = R.id.fragment_container
+
+val ANIM_FADE = TransactionAnimResources(
+    android.R.anim.fade_in, android.R.anim.fade_out, android.R.anim.fade_in, android.R.anim.fade_out)
+val ANIM_INTO = TransactionAnimResources(
+    R.anim.push_up_in, R.anim.push_up_out, R.anim.push_down_in, R.anim.push_down_out)
+val ANIM_TO_NEXT = TransactionAnimResources(
+    R.anim.slide_in_right, R.anim.slide_out_left, R.anim.slide_in_left, R.anim.slide_out_right)
 
 
 class MainViewModel : ViewModel() {
@@ -37,6 +48,19 @@ class MainViewModel : ViewModel() {
     fun atFarthestLocationReached() = compare(currentLocation, farthestLocation) == 0
 
     fun currentPage() = pageData
+
+    fun fragmentSelector(): Fragment {
+        return when (getCurrentPageTypeName()) {
+            "splash" -> SplashScreen.newInstance()
+            "moduleSelection" -> ModuleSelectionFragment.newInstance()
+            "moduleContent" -> ModuleContentFragment.newInstance()
+            "moduleList" -> ModuleListFragment.newInstance()
+            "lessonSelection" -> LessonSelectionFragment.newInstance()
+            "lessonContent" -> LessonContentFragment.newInstance()
+            "lessonImage" -> LessonImageFragment.newInstance()
+            else -> SplashScreen.newInstance()
+        }
+    }
 
     fun getCurrentPageTypeName() = pageTypes.get(pageData.value!!.pageType!!).name
 
@@ -95,13 +119,19 @@ class MainViewModel : ViewModel() {
             commitPageChange()
     }
 
-    fun navToNextPage() {
-        if (!pageIt.hasNext())
+    fun navToNextPage() :Boolean{
+        var navUp = false
+        if (!pageIt.hasNext()) {
             navOutOfLesson(false)
-        if (!pageIt.hasNext())
+            navUp = true
+        }
+        if (!pageIt.hasNext()) {
             navOutOfModule(false)
+            navUp = true
+        }
         currentLocation.pageNum += 1
         commitPageChange()
+        return navUp
     }
 
     fun navToPrevPage() {
@@ -160,7 +190,6 @@ class MainViewModel : ViewModel() {
         pageData.postValue(Page())
         pageDataLoaded = false
         loadPageData()
-
     }
 
     private fun compare(locationData1: LocationData, locationData2: LocationData): Int {

@@ -9,8 +9,9 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
-import androidx.navigation.fragment.findNavController
 import com.robertreed.papyrusarabic.R
+import com.robertreed.papyrusarabic.ui.ANIM_FADE
+import com.robertreed.papyrusarabic.ui.FRAGMENT_CONTAINER
 import com.robertreed.papyrusarabic.ui.MainViewModel
 
 class SplashScreen: Fragment(), View.OnClickListener {
@@ -55,7 +56,18 @@ class SplashScreen: Fragment(), View.OnClickListener {
 
     override fun onClick(v: View?) {
         viewModel.navToNextPage()
-        requireActivity().supportFragmentManager.popBackStack()
+        viewModel.currentPage().observe(viewLifecycleOwner, Observer {page ->
+            if(page.pageType != null) {
+                requireActivity().supportFragmentManager
+                    .beginTransaction()
+                    .setCustomAnimations(
+                        ANIM_FADE.enter, ANIM_FADE.exit, ANIM_FADE.popEnter, ANIM_FADE.popExit
+                    )
+                    .replace(FRAGMENT_CONTAINER, viewModel.fragmentSelector())
+                    .addToBackStack("splash")
+                    .commit()
+            }
+        })
     }
 
     companion object {

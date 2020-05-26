@@ -1,6 +1,5 @@
 package com.robertreed.papyrusarabic.ui.destinations
 
-
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -13,8 +12,10 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
-import androidx.navigation.fragment.findNavController
 import com.robertreed.papyrusarabic.R
+import com.robertreed.papyrusarabic.ui.ANIM_INTO
+import com.robertreed.papyrusarabic.ui.ANIM_TO_NEXT
+import com.robertreed.papyrusarabic.ui.FRAGMENT_CONTAINER
 import com.robertreed.papyrusarabic.ui.MainViewModel
 
 class ModuleSelectionFragment : Fragment() {
@@ -44,7 +45,18 @@ class ModuleSelectionFragment : Fragment() {
         gotoButton.isEnabled = false
         gotoButton.setOnClickListener {
             viewModel.navIntoModule()
-            requireActivity().supportFragmentManager.popBackStack()
+            viewModel.currentPage().observe(viewLifecycleOwner, Observer { page ->
+                if (page.pageType != null) {
+                    requireActivity().supportFragmentManager
+                        .beginTransaction()
+                        .setCustomAnimations(
+                            ANIM_INTO.enter, ANIM_INTO.exit, ANIM_INTO.popEnter, ANIM_INTO.popExit
+                        )
+                        .replace(FRAGMENT_CONTAINER, viewModel.fragmentSelector())
+                        .addToBackStack("moduleLaunchPage")
+                        .commit()
+                }
+            })
         }
 
         navLeft = view.findViewById(R.id.nav_left)
@@ -56,9 +68,24 @@ class ModuleSelectionFragment : Fragment() {
 
         navRight = view.findViewById(R.id.nav_right)
         navRight.isEnabled = false
+        navRight.visibility = View.INVISIBLE
         navRight.setOnClickListener {
             viewModel.navToNextPage()
-            requireActivity().supportFragmentManager.popBackStack()
+            viewModel.currentPage().observe(viewLifecycleOwner, Observer {page ->
+                if(page.pageType != null) {
+                    requireActivity().supportFragmentManager
+                        .beginTransaction()
+                        .setCustomAnimations(
+                            ANIM_TO_NEXT.enter,
+                            ANIM_TO_NEXT.exit,
+                            ANIM_TO_NEXT.popEnter,
+                            ANIM_TO_NEXT.popExit
+                        )
+                        .replace(FRAGMENT_CONTAINER, viewModel.fragmentSelector())
+                        .addToBackStack(null)
+                        .commit()
+                }
+            })
         }
 
         val pageLiveData = viewModel.currentPage()
@@ -78,8 +105,8 @@ class ModuleSelectionFragment : Fragment() {
 
             if(viewModel.hasNextPage())
                 navRight.isEnabled = true
+                navRight.visibility = View.VISIBLE
         })
-
         return view
     }
 
