@@ -7,7 +7,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.robertreed.papyrusarabic.R
-import com.robertreed.papyrusarabic.model.Page
+import com.robertreed.papyrusarabic.ui.animations.AnimResources
 
 class MainActivity : AppCompatActivity() {
 
@@ -35,7 +35,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun replacePage(owner: LifecycleOwner, anim: TransactionAnimResources) {
+    fun replacePage(owner: LifecycleOwner, anim: AnimResources) {
         Log.i("MAIN", "replacePageCalled")
         if(viewModel.hasPageLoaded()) {
             Log.i("MAIN", "pageReplaced")

@@ -10,6 +10,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import com.robertreed.papyrusarabic.R
 import com.robertreed.papyrusarabic.ui.*
+import com.robertreed.papyrusarabic.ui.animations.PageTextAnimUtil
 
 class LessonSelectionFragment : Fragment() {
 
@@ -98,6 +99,15 @@ class LessonSelectionFragment : Fragment() {
             }
         })
         return view
+    }
+
+    override fun onStart() {
+        super.onStart()
+        PageTextAnimUtil.fadeInText(
+            listOf(content1, content2, content3),
+            navRight,
+            viewModel.locationPreviouslyReached()
+        )
     }
 
     companion object {

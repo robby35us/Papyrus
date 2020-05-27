@@ -1,8 +1,6 @@
 package com.robertreed.papyrusarabic.ui.destinations
 
-import android.animation.ObjectAnimator
 import android.os.Bundle
-import android.os.Handler
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -14,6 +12,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import com.robertreed.papyrusarabic.R
 import com.robertreed.papyrusarabic.ui.*
+import com.robertreed.papyrusarabic.ui.animations.PageTextAnimUtil
 
 class ModuleContentFragment : Fragment() {
 
@@ -87,36 +86,11 @@ class ModuleContentFragment : Fragment() {
 
     override fun onStart() {
         super.onStart()
-        if(viewModel.locationPreviouslyReached()) {
-            content1.alpha = 1.0f
-            content2.alpha = 1.0f
-            content3.alpha = 1.0f
-            if(viewModel.hasNextPage()) {
-                navRight.visibility = View.VISIBLE
-                navRight.isEnabled = true
-            }
-        }
-        else {
-            ObjectAnimator.ofFloat(content1, "alpha", 1.0f).apply {
-                duration = 750
-                startDelay = 500
-                start()
-            }
-            ObjectAnimator.ofFloat(content2, "alpha", 1.0f).apply {
-                duration = 750
-                startDelay = 3500
-                start()
-            }
-            ObjectAnimator.ofFloat(content3, "alpha", 1.0f).apply {
-                duration = 750
-                startDelay = 7000
-                start()
-            }
-            Handler().postDelayed({
-                navRight.visibility = View.VISIBLE
-                navRight.isEnabled = true
-            }, 7000)
-        }
+        PageTextAnimUtil.fadeInText(
+            listOf(content1, content2, content3),
+            navRight,
+            viewModel.locationPreviouslyReached()
+        )
     }
 
     companion object {

@@ -1,6 +1,5 @@
 package com.robertreed.papyrusarabic.ui.destinations
 
-import android.graphics.drawable.Drawable
 import android.media.MediaPlayer
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -73,6 +72,8 @@ class LessonMediaFragment : Fragment() {
         prevButton.isEnabled = false
         prevButton.setOnClickListener {
             mediaPlayer.stop()
+            mediaPlayer.reset()
+            mediaPlayer.release()
 
             nextButton.isEnabled = true
 
@@ -86,14 +87,18 @@ class LessonMediaFragment : Fragment() {
         playButton = view.findViewById(R.id.play_button)
         playButton.isEnabled = false
         playButton.setOnClickListener {
-            mediaPlayer.stop()
-            loadMedia()
+            if(mediaPlayer.isPlaying)
+                mediaPlayer.pause()
+            mediaPlayer.seekTo(0)
+            mediaPlayer.start()
         }
 
         nextButton = view.findViewById(R.id.next_button)
         nextButton.isEnabled = false
         nextButton.setOnClickListener {
             mediaPlayer.stop()
+            mediaPlayer.reset()
+            mediaPlayer.release()
 
             prevButton.isEnabled = true
 
@@ -129,6 +134,7 @@ class LessonMediaFragment : Fragment() {
     }
 
     private fun loadMedia() {
+
         val currentData = mediaSet.get(index)
         header.text = currentData.name
 

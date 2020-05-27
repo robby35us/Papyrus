@@ -1,13 +1,10 @@
 package com.robertreed.papyrusarabic.ui.destinations
 
 import android.os.Bundle
-import android.os.Handler
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.animation.Animation
-import android.view.animation.AnimationUtils
 import android.widget.*
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -19,6 +16,7 @@ import com.robertreed.papyrusarabic.ui.ANIM_TO_NEXT
 import com.robertreed.papyrusarabic.ui.ANIM_TO_PREV
 import com.robertreed.papyrusarabic.ui.MainActivity
 import com.robertreed.papyrusarabic.ui.MainViewModel
+import com.robertreed.papyrusarabic.ui.animations.PageTextAnimUtil
 
 class ModuleListFragment : Fragment() {
 
@@ -31,7 +29,7 @@ class ModuleListFragment : Fragment() {
     private lateinit var contentList: ListView
     private lateinit var navLeft: ImageButton
     private lateinit var navRight: ImageButton
-    private lateinit var adapter : ContentListAdapter
+    private lateinit var adapter : PageTextAnimUtil.Companion.ContentListAdapter
     private val textList: Array<String?> = arrayOfNulls<String?>(3)
 
     override fun onCreateView(
@@ -68,7 +66,7 @@ class ModuleListFragment : Fragment() {
             }
         }
 
-        adapter = ContentListAdapter(textList)
+        adapter = PageTextAnimUtil.Companion.ContentListAdapter(textList, layoutInflater)
 
         contentList = view.findViewById(R.id.content_list)
         contentList.adapter = adapter
@@ -92,78 +90,17 @@ class ModuleListFragment : Fragment() {
 
     val observer = Observer<Page> {
         pageLiveData.removeObservers(viewLifecycleOwner)
-        if(viewModel.locationPreviouslyReached()) {
-            adapter.notifyDataSetChanged()
-            navRight.visibility = View.VISIBLE
-            navRight.isEnabled = true
-        }
-        else {
-            var index = 0
-
-            val animation = AnimationUtils.makeInChildBottomAnimation(requireContext())
-            animation.duration = 1000
-            animation.setAnimationListener(object : Animation.AnimationListener {
-                override fun onAnimationRepeat(animation: Animation?) {
-                    // left blank
-                }
-
-                override fun onAnimationEnd(animation: Animation?) {
-
-                    if (index < adapter.count - 1) {
-                        index += 1
-                        Handler().postDelayed({
-                            (adapter.getItem(index) as View).visibility = View.VISIBLE
-                            (adapter.getItem(index) as View).startAnimation(animation)
-                        }, 500)
-                    } else {
-                        navRight.isEnabled = true
-                        navRight.visibility = View.VISIBLE
-                    }
-                }
-
-                override fun onAnimationStart(animation: Animation?) {
-                    // left blank
-                }
-
-            })
-            Handler().postDelayed({
-                (adapter.getItem(index) as View).visibility = View.VISIBLE
-                (adapter.getItem(index) as View).startAnimation(animation)
-            }, 500)
-        }
+        PageTextAnimUtil.animateListIn(
+            requireContext(),
+            adapter,
+            navRight,
+            viewModel.locationPreviouslyReached()
+        )
     }
 
     override fun onStart() {
         super.onStart()
         pageLiveData.observe(viewLifecycleOwner, observer)
-    }
-
-    private inner class ContentListAdapter(var textList: Array<String?>) : BaseAdapter() {
-        private var textViews = arrayListOf<View>()
-
-        override fun getItem(position: Int): Any {
-            return textViews[position]
-        }
-
-        override fun getItemId(position: Int): Long {
-            return position.toLong()
-        }
-
-        override fun getCount(): Int {
-            return textList.size
-        }
-
-        override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
-            if(convertView == null)
-                textViews.add(layoutInflater.inflate(R.layout.item_list, parent, false))
-            else
-                textViews.add(convertView)
-            val textView = textViews[position].findViewById<TextView>(R.id.content)
-            pageLiveData.observe(viewLifecycleOwner, Observer {
-                textView.text = textList[position]
-            })
-            return textViews[position]
-        }
     }
 
     companion object {

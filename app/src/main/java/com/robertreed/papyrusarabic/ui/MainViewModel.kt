@@ -9,6 +9,7 @@ import com.robertreed.papyrusarabic.repository.LocationData
 import com.robertreed.papyrusarabic.repository.PapyrusRepository
 import com.robertreed.papyrusarabic.repository.iterators.LessonIterator
 import com.robertreed.papyrusarabic.repository.iterators.PageIterator
+import com.robertreed.papyrusarabic.ui.animations.AnimResources
 import com.robertreed.papyrusarabic.ui.destinations.*
 
 const val LESSON_PAGE_NUM_OFFSET = 1
@@ -16,11 +17,31 @@ const val MODULE_PAGE_NUM_OFFSET = 0
 const val NUM_LESSONS_PER_MODULE = 3
 const val FRAGMENT_CONTAINER = R.id.fragment_container
 
-val ANIM_FADE = TransactionAnimResources(android.R.anim.fade_in, android.R.anim.fade_out)
-val ANIM_INTO = TransactionAnimResources(R.anim.push_up_in, R.anim.push_up_out)
-val ANIM_OUT_OF = TransactionAnimResources(R.anim.push_down_in, R.anim.push_down_out)
-val ANIM_TO_NEXT = TransactionAnimResources(R.anim.slide_in_right, R.anim.slide_out_left)
-val ANIM_TO_PREV = TransactionAnimResources(R.anim.slide_in_left, R.anim.slide_out_right)
+val ANIM_FADE =
+    AnimResources(
+        android.R.anim.fade_in,
+        android.R.anim.fade_out
+    )
+val ANIM_INTO =
+    AnimResources(
+        R.anim.push_up_in,
+        R.anim.push_up_out
+    )
+val ANIM_OUT_OF =
+    AnimResources(
+        R.anim.push_down_in,
+        R.anim.push_down_out
+    )
+val ANIM_TO_NEXT =
+    AnimResources(
+        R.anim.slide_in_right,
+        R.anim.slide_out_left
+    )
+val ANIM_TO_PREV =
+    AnimResources(
+        R.anim.slide_in_left,
+        R.anim.slide_out_right
+    )
 
 
 class MainViewModel : ViewModel() {
