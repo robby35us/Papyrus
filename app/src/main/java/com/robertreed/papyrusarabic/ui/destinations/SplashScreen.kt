@@ -1,6 +1,7 @@
 package com.robertreed.papyrusarabic.ui.destinations
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,6 +13,7 @@ import androidx.lifecycle.Observer
 import com.robertreed.papyrusarabic.R
 import com.robertreed.papyrusarabic.ui.ANIM_FADE
 import com.robertreed.papyrusarabic.ui.FRAGMENT_CONTAINER
+import com.robertreed.papyrusarabic.ui.MainActivity
 import com.robertreed.papyrusarabic.ui.MainViewModel
 
 class SplashScreen: Fragment(), View.OnClickListener {
@@ -30,6 +32,8 @@ class SplashScreen: Fragment(), View.OnClickListener {
 
         val view = inflater.inflate(R.layout.fragment_splash_screen, container, false)
 
+        Log.i("SPLASH_SCREEN", "in onCreateView")
+
         screen = view.findViewById(R.id.splash_screen)
         screen.isEnabled = false
         screen.setOnClickListener(this)
@@ -43,8 +47,9 @@ class SplashScreen: Fragment(), View.OnClickListener {
         subtitleView.setOnClickListener(this)
 
         val pageLiveData = viewModel.currentPage()
-        pageLiveData.observe(viewLifecycleOwner, Observer { page ->
-            if (page.lessonId != null) {
+        pageLiveData.observe(viewLifecycleOwner, Observer {
+            if (viewModel.hasPageLoaded()) {
+                pageLiveData.removeObservers(viewLifecycleOwner)
                 screen.isEnabled = true
                 titleView.isEnabled = true
                 subtitleView.isEnabled = true
@@ -56,17 +61,8 @@ class SplashScreen: Fragment(), View.OnClickListener {
 
     override fun onClick(v: View?) {
         viewModel.navToNextPage()
-        viewModel.currentPage().observe(viewLifecycleOwner, Observer {page ->
-            if(page.pageType != null) {
-                requireActivity().supportFragmentManager
-                    .beginTransaction()
-                    .setCustomAnimations(
-                        ANIM_FADE.enter, ANIM_FADE.exit, ANIM_FADE.popEnter, ANIM_FADE.popExit
-                    )
-                    .replace(FRAGMENT_CONTAINER, viewModel.fragmentSelector())
-                    .addToBackStack("splash")
-                    .commit()
-            }
+        viewModel.currentPage().observe(viewLifecycleOwner, Observer {
+            (requireActivity() as MainActivity).replacePage(viewLifecycleOwner, ANIM_FADE)
         })
     }
 

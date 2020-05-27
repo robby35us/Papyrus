@@ -2,11 +2,12 @@ package com.robertreed.papyrusarabic.ui
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import androidx.fragment.app.Fragment
+import android.util.Log
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.robertreed.papyrusarabic.R
-import com.robertreed.papyrusarabic.ui.destinations.*
+import com.robertreed.papyrusarabic.model.Page
 
 class MainActivity : AppCompatActivity() {
 
@@ -22,15 +23,28 @@ class MainActivity : AppCompatActivity() {
 
         if(currentFragment == null) {
             val pageLiveData = viewModel.currentPage()
-            pageLiveData.observe(this, Observer {page ->
-                if(page.pageType != null) {
-                    val fragment = viewModel.fragmentSelector()
+            pageLiveData.observe(this, Observer {
+                if(viewModel.hasPageLoaded()) {
+                    pageLiveData.removeObservers(this)
                     supportFragmentManager
                         .beginTransaction()
-                        .add(R.id.fragment_container, fragment)
+                        .add(R.id.fragment_container, viewModel.fragmentSelector())
                         .commit()
                 }
             })
+        }
+    }
+
+    fun replacePage(owner: LifecycleOwner, anim: TransactionAnimResources) {
+        Log.i("MAIN", "replacePageCalled")
+        if(viewModel.hasPageLoaded()) {
+            Log.i("MAIN", "pageReplaced")
+            viewModel.currentPage().removeObservers(owner)
+            supportFragmentManager
+                .beginTransaction()
+                .setCustomAnimations(anim.enter, anim.exit)
+                .replace(FRAGMENT_CONTAINER, viewModel.fragmentSelector())
+                .commit()
         }
     }
 }

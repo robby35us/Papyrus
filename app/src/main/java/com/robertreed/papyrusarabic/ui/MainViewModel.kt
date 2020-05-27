@@ -16,12 +16,11 @@ const val MODULE_PAGE_NUM_OFFSET = 0
 const val NUM_LESSONS_PER_MODULE = 3
 const val FRAGMENT_CONTAINER = R.id.fragment_container
 
-val ANIM_FADE = TransactionAnimResources(
-    android.R.anim.fade_in, android.R.anim.fade_out, android.R.anim.fade_in, android.R.anim.fade_out)
-val ANIM_INTO = TransactionAnimResources(
-    R.anim.push_up_in, R.anim.push_up_out, R.anim.push_down_in, R.anim.push_down_out)
-val ANIM_TO_NEXT = TransactionAnimResources(
-    R.anim.slide_in_right, R.anim.slide_out_left, R.anim.slide_in_left, R.anim.slide_out_right)
+val ANIM_FADE = TransactionAnimResources(android.R.anim.fade_in, android.R.anim.fade_out)
+val ANIM_INTO = TransactionAnimResources(R.anim.push_up_in, R.anim.push_up_out)
+val ANIM_OUT_OF = TransactionAnimResources(R.anim.push_down_in, R.anim.push_down_out)
+val ANIM_TO_NEXT = TransactionAnimResources(R.anim.slide_in_right, R.anim.slide_out_left)
+val ANIM_TO_PREV = TransactionAnimResources(R.anim.slide_in_left, R.anim.slide_out_right)
 
 
 class MainViewModel : ViewModel() {
@@ -64,11 +63,14 @@ class MainViewModel : ViewModel() {
 
     fun getCurrentPageTypeName() = pageTypes.get(pageData.value!!.pageType!!).name
 
+
     fun hasNextLesson() = lessonIt.hasNext()
 
     fun hasNextModule() = lessonIt.hasNext()
 
     fun hasNextPage() = pageIt.hasNext()
+
+    fun hasPageLoaded() = pageDataLoaded && pageData.value!!.pageType != null
 
     fun hasPrevLesson() = lessonIt.hasPrevious()
 
@@ -77,6 +79,7 @@ class MainViewModel : ViewModel() {
     fun hasPrevPage() = pageIt.hasPrevious()
 
     fun isLessonCompleted() = compare(currentLocation, farthestLocation) >= 0
+
 
     fun locationPreviouslyReached() = compare(currentLocation, farthestLocation) > 0
 
@@ -119,27 +122,18 @@ class MainViewModel : ViewModel() {
             commitPageChange()
     }
 
-    fun navToNextPage() :Boolean{
-        var navUp = false
-        if (!pageIt.hasNext()) {
-            navOutOfLesson(false)
-            navUp = true
+    fun navToNextPage() {
+        if(pageIt.hasNext()) {
+            currentLocation.pageNum += 1
+            commitPageChange()
         }
-        if (!pageIt.hasNext()) {
-            navOutOfModule(false)
-            navUp = true
-        }
-        currentLocation.pageNum += 1
-        commitPageChange()
-        return navUp
     }
 
     fun navToPrevPage() {
-        if (pageIt.hasPrevious())
+        if(pageIt.hasPrevious()) {
             currentLocation.pageNum -= 1
-        else
-            navOutOfLesson(false)
-        commitPageChange()
+            commitPageChange()
+        }
     }
 
     fun nextLesson() {
@@ -180,20 +174,32 @@ class MainViewModel : ViewModel() {
 
     fun setLocation(location: LocationData) {
         currentLocation = location
-        pageDataLoaded = false
-        loadPageData()
+        commitPageChange()
     }
 
     private fun commitPageChange() {
         if (compare(currentLocation, farthestLocation) > 0)
             farthestLocation = currentLocation
-        pageData.postValue(Page())
         pageDataLoaded = false
+        pageData.postValue(Page())
         loadPageData()
     }
 
     private fun compare(locationData1: LocationData, locationData2: LocationData): Int {
-        return when {
+
+        if(locationData1.moduleNum == 0 && locationData2.moduleNum > 0)
+            return when {
+                locationData1.pageNum - MODULE_PAGE_NUM_OFFSET < locationData2.moduleNum -> -1
+                locationData1.pageNum - MODULE_PAGE_NUM_OFFSET > locationData2.moduleNum -> 1
+                else -> 0
+            }
+        else if(locationData1.moduleNum > 0 && locationData1.lessonNum == 0)
+            return when {
+                locationData1.pageNum - LESSON_PAGE_NUM_OFFSET < locationData2.lessonNum -> -1
+                locationData1.pageNum - LESSON_PAGE_NUM_OFFSET > locationData2.lessonNum -> 1
+                else -> 0
+            }
+        else return when {
             locationData1.moduleNum < locationData2.moduleNum -> -1
             locationData1.moduleNum > locationData2.moduleNum -> 1
             else -> when {
@@ -233,12 +239,14 @@ class MainViewModel : ViewModel() {
                 }
             }
 
-        if (pageIt.isLoaded())
-            pageData.postValue(pageIt.get(currentLocation.pageNum))
-        else
+        if (pageIt.isLoaded()) {
+            pageIt.setIndex(currentLocation.pageNum)
+            pageData.postValue(pageIt.peek())
+        } else
             pageIt.getLiveData().observeForever {
                 if (it.isNotEmpty()) {
-                    pageData.postValue(pageIt.get(currentLocation.pageNum))
+                    pageIt.setIndex(currentLocation.pageNum)
+                    pageData.postValue(pageIt.peek())
                     loadPageData()
                 }
 
