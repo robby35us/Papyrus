@@ -12,6 +12,9 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 
 import com.robertreed.papyrusarabic.R
+import com.robertreed.papyrusarabic.ui.ANIM_TO_NEXT
+import com.robertreed.papyrusarabic.ui.ANIM_TO_PREV
+import com.robertreed.papyrusarabic.ui.MainActivity
 import com.robertreed.papyrusarabic.ui.MainViewModel
 
 class LessonImageFragment : Fragment() {
@@ -41,23 +44,30 @@ class LessonImageFragment : Fragment() {
         navLeft.isEnabled = false
         navLeft.setOnClickListener {
             viewModel.navToPrevPage()
-            requireActivity().supportFragmentManager.popBackStack()
+            viewModel.currentPage().observe(viewLifecycleOwner, Observer {
+                (requireActivity() as MainActivity).replacePage(viewLifecycleOwner, ANIM_TO_PREV)
+            })
         }
 
         navRight = view.findViewById(R.id.nav_right)
         navRight.isEnabled = false
         navRight.setOnClickListener {
             viewModel.navToNextPage()
-            requireActivity().supportFragmentManager.popBackStack()
+            viewModel.currentPage().observe(viewLifecycleOwner, Observer {
+                (requireActivity() as MainActivity).replacePage(viewLifecycleOwner, ANIM_TO_NEXT)
+            })
         }
 
         val pageLiveData = viewModel.currentPage()
         pageLiveData.observe(viewLifecycleOwner, Observer { page ->
-            context.text = page.number.toString()
-            header.text = page.header
-            subHeader.text = page.sub_header
-            navLeft.isEnabled = true
-            navRight.isEnabled = true
+            if(viewModel.hasPageLoaded()) {
+                pageLiveData.removeObservers(viewLifecycleOwner)
+                context.text = page.number.toString()
+                header.text = page.header
+                subHeader.text = page.sub_header
+                navLeft.isEnabled = true
+                navRight.isEnabled = true
+            }
         })
 
         return view

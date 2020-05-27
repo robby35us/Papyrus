@@ -6,14 +6,12 @@ import androidx.core.util.set
 import androidx.room.Room
 import com.robertreed.papyrusarabic.database.PapyrusDatabase
 import com.robertreed.papyrusarabic.model.*
-import com.robertreed.papyrusarabic.repository.iterators.LessonIterator
-import com.robertreed.papyrusarabic.repository.iterators.ModuleIterator
-import com.robertreed.papyrusarabic.repository.iterators.PageIterator
-import com.robertreed.papyrusarabic.repository.iterators.PageTypes
+import com.robertreed.papyrusarabic.repository.iterators.*
 import java.util.*
 
 private const val DATABASE_NAME = "papyrus-database"
 private const val MODULE_NUM_OFFSET = 20
+private const val MEDIA_OFFSET = 10
 class PapyrusRepository private constructor(context: Context){
 
     private val database: PapyrusDatabase = Room.databaseBuilder(
@@ -27,10 +25,12 @@ class PapyrusRepository private constructor(context: Context){
     private val moduleDao = database.moduleDao()
     private val pageDao = database.pageDao()
     private val pageTypeDao = database.pageTypeDao()
+    private val mediaDao = database.mediaDao()
 
-    private var moduleIt = ModuleIterator(moduleDao.getModules())
-    private var lessonIteratorArray = SparseArray<LessonIterator>()
+    private val moduleIt = ModuleIterator(moduleDao.getModules())
+    private val lessonIteratorArray = SparseArray<LessonIterator>()
     private val pageIteratorArray = SparseArray<PageIterator>()
+    private val mediaSparseArray = SparseArray<MediaIterator>()
     private val pageTypes = PageTypes(pageTypeDao.getPageTypes())
 
     fun clearDatabase() {
@@ -57,15 +57,35 @@ class PapyrusRepository private constructor(context: Context){
         if(!lessonIt.isLoaded())
             throw IllegalAccessError()
 
-        val pageOffset = moduleIndex * MODULE_NUM_OFFSET + lessonIndex
+        val pageIndex = moduleIndex * MODULE_NUM_OFFSET + lessonIndex
 
-        if(pageIteratorArray[pageOffset, null] == null) {
+        if(pageIteratorArray[pageIndex, null] == null) {
             val lessonId = lessonIt.get(lessonIndex).id
             val pageIt = PageIterator(pageDao.getPagesByLessonID(lessonId))
-            pageIteratorArray[pageOffset] = pageIt
+            pageIteratorArray[pageIndex] = pageIt
         }
 
-        return pageIteratorArray[pageOffset]
+        return pageIteratorArray[pageIndex]
+    }
+
+    fun getMediaIterator(moduleIndex: Int, lessonIndex: Int, pageIndex: Int): MediaIterator {
+        val pageIterator = getPageIterator(moduleIndex, lessonIndex)
+        if(!pageIterator.isLoaded())
+            throw IllegalAccessError()
+
+        val mediaIndex = (moduleIndex * MODULE_NUM_OFFSET + lessonIndex) * MEDIA_OFFSET + pageIndex
+
+        if(mediaSparseArray[mediaIndex, null] == null) {
+            val pageId = pageIterator.get(pageIndex).id
+            val mediaIterator = MediaIterator(mediaDao.getMediaByPageId(pageId))
+            mediaSparseArray[mediaIndex] = mediaIterator
+        }
+
+        return mediaSparseArray[mediaIndex]
+    }
+
+    fun insertMedia(media: Media) {
+        mediaDao.insert(media)
     }
 
     fun insertModule(module: Module) {

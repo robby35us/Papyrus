@@ -19,7 +19,9 @@ class LessonSelectionFragment : Fragment() {
     private lateinit var item: View
     private lateinit var starImage: ImageView
     private lateinit var content: TextView
-    private lateinit var subHeader: TextView
+    private lateinit var content1: TextView
+    private lateinit var content2: TextView
+    private lateinit var content3: TextView
     private lateinit var gotoButton: Button
     private lateinit var navLeft: ImageButton
     private lateinit var navRight: ImageButton
@@ -39,7 +41,9 @@ class LessonSelectionFragment : Fragment() {
         starImage = item.findViewById(R.id.star_image)
         content = item.findViewById(R.id.content)
 
-        subHeader = view.findViewById(R.id.sub_header)
+        content1 = view.findViewById(R.id.content1)
+        content2 = view.findViewById(R.id.content2)
+        content3 = view.findViewById(R.id.content3)
 
         navLeft = view.findViewById(R.id.nav_left)
         navLeft.isEnabled = false
@@ -75,7 +79,9 @@ class LessonSelectionFragment : Fragment() {
                 pageLiveData.removeObservers(viewLifecycleOwner)
                 context.text = page.number.toString()
                 content.text = page.header
-                subHeader.text = page.sub_header
+                content1.text = page.content1
+                content2.text = page.content2
+                content3.text = page.content3
 
                 navLeft.isEnabled = true
 
@@ -88,6 +94,7 @@ class LessonSelectionFragment : Fragment() {
                     gotoButton.setText(R.string.start_lesson)
                     starImage.setImageResource(android.R.drawable.btn_star_big_off)
                 }
+                gotoButton.isEnabled = true
             }
         })
         return view

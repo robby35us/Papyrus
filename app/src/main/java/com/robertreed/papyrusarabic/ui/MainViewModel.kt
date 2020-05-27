@@ -11,7 +11,7 @@ import com.robertreed.papyrusarabic.repository.iterators.LessonIterator
 import com.robertreed.papyrusarabic.repository.iterators.PageIterator
 import com.robertreed.papyrusarabic.ui.destinations.*
 
-const val LESSON_PAGE_NUM_OFFSET = 2
+const val LESSON_PAGE_NUM_OFFSET = 1
 const val MODULE_PAGE_NUM_OFFSET = 0
 const val NUM_LESSONS_PER_MODULE = 3
 const val FRAGMENT_CONTAINER = R.id.fragment_container
@@ -59,11 +59,16 @@ class MainViewModel : ViewModel() {
             "lessonSelection" -> LessonSelectionFragment.newInstance()
             "lessonContent" -> LessonContentFragment.newInstance()
             "lessonImage" -> LessonImageFragment.newInstance()
+            "mediaPlayer" -> LessonMediaFragment.newInstance()
             else -> SplashScreen.newInstance()
         }
     }
 
     fun getCurrentPageTypeName() = pageTypes.get(pageData.value!!.pageType!!).name
+
+    fun getMedia() = repository.getMediaIterator(
+        currentLocation.moduleNum, currentLocation.lessonNum, currentLocation.pageNum
+    )
 
     fun hasNextLesson() = lessonIt.hasNext()
 

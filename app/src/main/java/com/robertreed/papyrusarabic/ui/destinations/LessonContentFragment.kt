@@ -12,7 +12,7 @@ import android.widget.TextView
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import com.robertreed.papyrusarabic.R
-import com.robertreed.papyrusarabic.ui.MainViewModel
+import com.robertreed.papyrusarabic.ui.*
 
 class LessonContentFragment : Fragment() {
 
@@ -34,48 +34,46 @@ class LessonContentFragment : Fragment() {
 
         val pageLiveData = viewModel.currentPage()
 
-
         context = view.findViewById(R.id.context)
-        pageLiveData.observe(viewLifecycleOwner, Observer {
-                page -> context.text = page.number.toString()
-        })
-
         header = view.findViewById(R.id.header)
-        pageLiveData.observe(viewLifecycleOwner, Observer {
-                page -> header.text = page.header
-        })
-
         content1 = view.findViewById(R.id.content1)
-        pageLiveData.observe(viewLifecycleOwner, Observer {
-                page -> content1.text = page.content1
-        })
-
         content2 = view.findViewById(R.id.content2)
-        pageLiveData.observe(viewLifecycleOwner, Observer {
-                page -> content2.text = page.content2
-        })
-
         content3 = view.findViewById(R.id.content3)
-        pageLiveData.observe(viewLifecycleOwner, Observer {
-                page -> content3.text = page.content3
-        })
 
         navLeft = view.findViewById(R.id.nav_left)
         navLeft.setOnClickListener {
-            if(viewModel.hasPrevPage())
+            val anim = if(viewModel.hasPrevPage()) {
                 viewModel.navToPrevPage()
-            else
+                ANIM_TO_PREV
+            } else {
                 viewModel.navOutOfLesson()
-            requireActivity().supportFragmentManager.popBackStack()
+                ANIM_OUT_OF
+            }
+            viewModel.currentPage().observe(viewLifecycleOwner, Observer {
+                (requireActivity() as MainActivity).replacePage(viewLifecycleOwner, anim)
+            })
         }
 
         navRight = view.findViewById(R.id.nav_right)
-        navRight.setOnClickListener {
-            viewModel.navToNextPage()
-            requireActivity().supportFragmentManager.popBackStack()
-        }
         navRight.visibility = View.INVISIBLE
         navRight.isEnabled = false
+        navRight.setOnClickListener {
+            viewModel.navToNextPage()
+            viewModel.currentPage().observe(viewLifecycleOwner, Observer {
+                (requireActivity() as MainActivity).replacePage(viewLifecycleOwner, ANIM_TO_NEXT)
+            })
+        }
+
+        pageLiveData.observe(viewLifecycleOwner, Observer {page ->
+            if(viewModel.hasPageLoaded()) {
+                pageLiveData.removeObservers(viewLifecycleOwner)
+                context.text = page.number.toString()
+                header.text = page.header
+                content1.text = page.content1
+                content2.text = page.content2
+                content3.text = page.content3
+            }
+        })
 
         return view
     }

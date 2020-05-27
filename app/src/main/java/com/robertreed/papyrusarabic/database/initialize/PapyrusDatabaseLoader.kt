@@ -2,7 +2,6 @@ package com.robertreed.papyrusarabic.database.initialize
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.util.SparseArray
 import com.robertreed.papyrusarabic.R
 import com.robertreed.papyrusarabic.model.*
@@ -22,6 +21,7 @@ class PapyrusDatabaseLoader : AppCompatActivity() {
     private lateinit var lessonIds: SparseArray<UUID>
     private lateinit var pageTypeIds: ArrayList<UUID>
     private lateinit var imageIds: ArrayList<UUID>
+    private lateinit var pageIds: SparseArray<UUID>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,14 +39,17 @@ class PapyrusDatabaseLoader : AppCompatActivity() {
             val lessonSheet = workbook.getSheetAt(1)
             lessonIds = insertLessons(lessonSheet)
 
-            val pageTypeSheet = workbook.getSheetAt(3)
+            val pageTypeSheet = workbook.getSheetAt(4)
             pageTypeIds = insertPageTypes(pageTypeSheet)
 
-            val imageSheet = workbook.getSheetAt(4)
+            val imageSheet = workbook.getSheetAt(5)
             imageIds = insertImages(imageSheet)
 
             val pageSheet = workbook.getSheetAt(2)
-            insertPages(pageSheet)
+            pageIds = insertPages(pageSheet)
+
+            val mediaSheet = workbook.getSheetAt(3)
+            insertMedia(mediaSheet)
         }catch (e:Exception) {
             throw e
         }
@@ -126,12 +129,14 @@ class PapyrusDatabaseLoader : AppCompatActivity() {
         return imageUUIDList
     }
 
-    private fun insertPages(sheet: Sheet) {
+    private fun insertPages(sheet: Sheet) : SparseArray<UUID>{
+        val pageUUIDSparseArray = SparseArray<UUID>()
         for(i in 1 until sheet.physicalNumberOfRows) {
             val row: Row = sheet.getRow(i)
 
             val moduleNumber = row.getCell(0).numericCellValue.toInt()
             val lessonNumber = row.getCell(1).numericCellValue.toInt()
+
             val page = Page(
                 lessonId = lessonIds.get(moduleNumber * 10 + lessonNumber),
                 number = row.getCell(2).numericCellValue.toInt(),
@@ -157,11 +162,33 @@ class PapyrusDatabaseLoader : AppCompatActivity() {
                 else
                     null,
                 image = imageIds[row.getCell(9)?.numericCellValue?.toInt()?.minus(1)?: 0]
-
             )
+            pageUUIDSparseArray.append((moduleNumber * 10 + lessonNumber) * 10 + page.number, page.id)
             GlobalScope.launch {
                 repository.insertPage(page)
                 //Log.i("INSERT_PAGES", repository.getPage(page.id)!!.toString())
+            }
+        }
+        return pageUUIDSparseArray
+    }
+
+    private fun insertMedia(sheet: Sheet) {
+        for(i in 1 until sheet.physicalNumberOfRows) {
+            val row: Row = sheet.getRow(i)
+
+            val moduleNumber = row.getCell(0).numericCellValue.toInt()
+            val lessonNumber = row.getCell(1).numericCellValue.toInt()
+            val pageNumber = row.getCell(2).numericCellValue.toInt()
+
+            val media = Media(
+                page = pageIds[(moduleNumber * 10 + lessonNumber) * 10 + pageNumber],
+                name = row.getCell(4).stringCellValue,
+                imageName = row.getCell(5).stringCellValue,
+                soundName = row.getCell(6).stringCellValue
+            )
+            GlobalScope.launch {
+                repository.insertMedia(media)
+                //Log.i("INSERT_LESSONS", repository.getLesson(lesson.id)!!.toString())
             }
         }
     }
