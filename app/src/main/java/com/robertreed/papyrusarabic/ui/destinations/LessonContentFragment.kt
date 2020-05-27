@@ -37,27 +37,27 @@ class LessonContentFragment : Fragment() {
 
         context = view.findViewById(R.id.context)
         pageLiveData.observe(viewLifecycleOwner, Observer {
-                page -> context.text = page?.number.toString()
+                page -> context.text = page.number.toString()
         })
 
         header = view.findViewById(R.id.header)
         pageLiveData.observe(viewLifecycleOwner, Observer {
-                page -> header.text = page?.header
+                page -> header.text = page.header
         })
 
         content1 = view.findViewById(R.id.content1)
         pageLiveData.observe(viewLifecycleOwner, Observer {
-                page -> content1.text = page?.content1
+                page -> content1.text = page.content1
         })
 
         content2 = view.findViewById(R.id.content2)
         pageLiveData.observe(viewLifecycleOwner, Observer {
-                page -> content2.text = page?.content2
+                page -> content2.text = page.content2
         })
 
         content3 = view.findViewById(R.id.content3)
         pageLiveData.observe(viewLifecycleOwner, Observer {
-                page -> content3.text = page?.content3
+                page -> content3.text = page.content3
         })
 
         navLeft = view.findViewById(R.id.nav_left)

@@ -8,11 +8,8 @@ import android.view.ViewGroup
 import android.widget.*
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
-import androidx.navigation.fragment.findNavController
 import com.robertreed.papyrusarabic.R
-import com.robertreed.papyrusarabic.ui.LESSON_PAGE_NUM_OFFSET
-import com.robertreed.papyrusarabic.ui.MainViewModel
-import com.robertreed.papyrusarabic.ui.NUM_LESSONS_PER_MODULE
+import com.robertreed.papyrusarabic.ui.*
 
 class LessonSelectionFragment : Fragment() {
 
@@ -48,38 +45,49 @@ class LessonSelectionFragment : Fragment() {
         navLeft.isEnabled = false
         navLeft.setOnClickListener {
             viewModel.navToPrevPage()
-            requireActivity().supportFragmentManager.popBackStack()
+            viewModel.currentPage().observe(viewLifecycleOwner, Observer {
+                (requireActivity() as MainActivity).replacePage(viewLifecycleOwner, ANIM_TO_PREV)
+            })
         }
 
         gotoButton = view.findViewById(R.id.goto_button)
         gotoButton.isEnabled = false
         gotoButton.setOnClickListener {
             viewModel.navIntoLesson()
-            requireActivity().supportFragmentManager.popBackStack()
+            viewModel.currentPage().observe(viewLifecycleOwner, Observer {
+                (requireActivity() as MainActivity).replacePage(viewLifecycleOwner, ANIM_INTO)
+            })
         }
 
         navRight = view.findViewById(R.id.nav_right)
         navRight.isEnabled = false
+        navRight.visibility = View.INVISIBLE
         navRight.setOnClickListener {
             viewModel.navToNextPage()
-            requireActivity().supportFragmentManager.popBackStack()
+            viewModel.currentPage().observe(viewLifecycleOwner, Observer {
+                (requireActivity() as MainActivity).replacePage(viewLifecycleOwner, ANIM_TO_NEXT)
+            })
         }
 
         val pageLiveData = viewModel.currentPage()
         pageLiveData.observe(viewLifecycleOwner, Observer { page ->
-            context.text = page?.number.toString()
-            content.text = page?.header
-            subHeader.text = page?.sub_header
+            if(viewModel.hasPageLoaded()) {
+                pageLiveData.removeObservers(viewLifecycleOwner)
+                context.text = page.number.toString()
+                content.text = page.header
+                subHeader.text = page.sub_header
 
-            navLeft.isEnabled = true
-            navRight.isEnabled = viewModel.hasNextPage()
+                navLeft.isEnabled = true
 
-            if(viewModel.isLessonCompleted()) {
-                starImage.setImageResource(android.R.drawable.btn_star_big_on)
-                gotoButton.setText(R.string.restart_lesson)
-            } else {
-                gotoButton.setText(R.string.start_lesson)
-                starImage.setImageResource(android.R.drawable.btn_star_big_off)
+                if (viewModel.isLessonCompleted()) {
+                    starImage.setImageResource(android.R.drawable.btn_star_big_on)
+                    gotoButton.setText(R.string.restart_lesson)
+                    navRight.isEnabled = true
+                    navRight.visibility = View.VISIBLE
+                } else {
+                    gotoButton.setText(R.string.start_lesson)
+                    starImage.setImageResource(android.R.drawable.btn_star_big_off)
+                }
             }
         })
         return view

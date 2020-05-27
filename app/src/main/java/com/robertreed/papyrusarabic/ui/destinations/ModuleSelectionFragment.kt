@@ -95,9 +95,10 @@ class ModuleSelectionFragment : Fragment() {
                     )
                 }
 
-                if (viewModel.hasNextPage())
+                if (viewModel.hasNextPage()) {
                     navRight.isEnabled = true
-                navRight.visibility = View.VISIBLE
+                    navRight.visibility = View.VISIBLE
+                }
             }
         })
         return view

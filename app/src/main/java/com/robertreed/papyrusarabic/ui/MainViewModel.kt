@@ -25,6 +25,7 @@ val ANIM_TO_PREV = TransactionAnimResources(R.anim.slide_in_left, R.anim.slide_o
 
 class MainViewModel : ViewModel() {
 
+    private val dummyPage = Page()
     private val repository = PapyrusRepository.get()
     private var moduleIt = repository.getModuleIterator()
     private var lessonIt = LessonIterator(MutableLiveData(listOf()))
@@ -34,13 +35,14 @@ class MainViewModel : ViewModel() {
     private var currentLocation = LocationData()
     private var farthestLocation = LocationData()
 
-    private val pageData = MutableLiveData(Page())
+    private val pageData = MutableLiveData(dummyPage)
     private var pageDataLoaded = false
 
     init {
         loadPageData()
         pageData.observeForever {
-            pageDataLoaded = pageData.value!!.lessonId != null
+            pageDataLoaded = moduleIt.isLoaded() && lessonIt.isLoaded()
+                    && pageIt.isLoaded() && pageData.value!!.pageType != null
         }
     }
 
@@ -62,7 +64,6 @@ class MainViewModel : ViewModel() {
     }
 
     fun getCurrentPageTypeName() = pageTypes.get(pageData.value!!.pageType!!).name
-
 
     fun hasNextLesson() = lessonIt.hasNext()
 
@@ -180,8 +181,8 @@ class MainViewModel : ViewModel() {
     private fun commitPageChange() {
         if (compare(currentLocation, farthestLocation) > 0)
             farthestLocation = currentLocation
+        pageData.postValue(dummyPage)
         pageDataLoaded = false
-        pageData.postValue(Page())
         loadPageData()
     }
 
@@ -215,22 +216,29 @@ class MainViewModel : ViewModel() {
     }
 
     private fun loadPageData() {
-        if (moduleIt.isLoaded())
+        if (moduleIt.isLoaded()) {
+            moduleIt.setIndex(currentLocation.moduleNum)
             lessonIt = repository.getLessonIterator(currentLocation.moduleNum)
-        else
+        }else {
             moduleIt.getLiveData().observeForever {
                 if (it.isNotEmpty()) {
+                    moduleIt.setIndex(currentLocation.moduleNum)
                     lessonIt = repository.getLessonIterator(currentLocation.moduleNum)
                     loadPageData()
                 }
             }
+            return
+        }
 
-        if (lessonIt.isLoaded())
+
+        if (lessonIt.isLoaded()) {
+            lessonIt.setIndex(currentLocation.lessonNum)
             pageIt =
                 repository.getPageIterator(currentLocation.moduleNum, currentLocation.lessonNum)
-        else
+        } else {
             lessonIt.getLiveData().observeForever {
                 if (it.isNotEmpty()) {
+                    lessonIt.setIndex(currentLocation.lessonNum)
                     pageIt = repository.getPageIterator(
                         currentLocation.moduleNum,
                         currentLocation.lessonNum
@@ -238,6 +246,8 @@ class MainViewModel : ViewModel() {
                     loadPageData()
                 }
             }
+            return
+        }
 
         if (pageIt.isLoaded()) {
             pageIt.setIndex(currentLocation.pageNum)
@@ -247,9 +257,8 @@ class MainViewModel : ViewModel() {
                 if (it.isNotEmpty()) {
                     pageIt.setIndex(currentLocation.pageNum)
                     pageData.postValue(pageIt.peek())
-                    loadPageData()
                 }
-
             }
+        // return
     }
 }

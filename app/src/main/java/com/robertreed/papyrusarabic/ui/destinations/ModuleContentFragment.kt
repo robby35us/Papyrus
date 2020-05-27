@@ -73,11 +73,11 @@ class ModuleContentFragment : Fragment() {
         pageLiveData.observe(viewLifecycleOwner, Observer { page ->
             if(viewModel.hasPageLoaded()) {
                 pageLiveData.removeObservers(viewLifecycleOwner)
-                context.text = page?.number.toString()
-                header.text = page?.header
-                content1.text = page?.content1
-                content2.text = page?.content2
-                content3.text = page?.content3
+                context.text = page.number.toString()
+                header.text = page.header
+                content1.text = page.content1
+                content2.text = page.content2
+                content3.text = page.content3
                 navLeft.isEnabled = true
             }
         })
