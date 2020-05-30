@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/colorTextLight"
-    tools:context=".ui.destinations.LessonContentFragment">
+    tools:context=".ui.destinations.ContentFailureFragment">
 
     <ImageButton
         android:id="@+id/nav_left"
@@ -64,14 +64,13 @@
                 android:layout_marginBottom="16dp"
                 android:gravity="center"
                 android:padding="@dimen/default_padding"
-                android:textAllCaps="false"
+                android:text="@string/header_no_content"
                 android:textAppearance="@style/TextAppearance.AppCompat.Large"
                 android:textColor="@color/colorPrimaryDark"
                 android:textSize="24sp"
                 app:layout_constraintBottom_toTopOf="@+id/guideline"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                tools:text="Header" />
+                app:layout_constraintStart_toStartOf="parent" />
 
             <androidx.constraintlayout.widget.Guideline
                 android:id="@+id/guideline"
@@ -81,58 +80,21 @@
                 app:layout_constraintGuide_percent="0.2" />
 
             <TextView
-                android:id="@+id/content1"
+                android:id="@+id/sub_header"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="16dp"
                 android:layout_marginEnd="16dp"
-                android:alpha="0.0"
                 android:gravity="center"
                 android:padding="@dimen/default_padding"
+                android:text="@string/sub_header_no_content"
                 android:textAlignment="center"
                 android:textColor="@color/colorPrimaryDark"
-                android:textSize="18sp"
+                android:textSize="24sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/guideline"
-                tools:text="Some text" />
-
-            <TextView
-                android:id="@+id/content2"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="16dp"
-                android:layout_marginEnd="16dp"
-                android:alpha="0.0"
-                android:gravity="center"
-                android:padding="@dimen/default_padding"
-                android:textAlignment="center"
-                android:textColor="@color/colorPrimaryDark"
-                android:textSize="18sp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/content1"
-                tools:text="Some Other Text" />
-
-            <TextView
-                android:id="@+id/content3"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="16dp"
-                android:layout_marginEnd="16dp"
-                android:alpha="0.0"
-                android:gravity="center"
-                android:padding="@dimen/default_padding"
-                android:textAlignment="center"
-                android:textColor="@color/colorPrimaryDark"
-                android:textSize="18sp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/content2"
-                tools:text="Some other other text" />
+                app:layout_constraintTop_toTopOf="@+id/guideline" />
 
             <View
                 android:id="@+id/dividerLeft"

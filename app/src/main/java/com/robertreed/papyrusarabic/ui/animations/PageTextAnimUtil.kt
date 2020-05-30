@@ -1,5 +1,6 @@
 package com.robertreed.papyrusarabic.ui.animations
 
+import android.animation.Animator
 import android.animation.ObjectAnimator
 import android.content.Context
 import android.os.Handler
@@ -11,34 +12,48 @@ import android.view.animation.AnimationUtils
 import android.widget.BaseAdapter
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.arch.core.util.Function
 import com.robertreed.papyrusarabic.R
 
 private const val INITIAL_DELAY = 500L
 private const val DURATION = 750L
-private const val PAUSE_DURATION = 2000L
+private const val PAUSE_DURATION = 1000L
 
 class PageTextAnimUtil private constructor(){
 
     companion object {
 
-        fun fadeInText(textViewList: List<TextView>, navRight: ImageView, locationReached: Boolean) {
+        fun fadeInText(textViewList: List<TextView>, navRight: ImageView, locationReached: Boolean): Function<Unit, Unit> {
             if (locationReached) {
                 for (view in textViewList)
                     view.alpha = 1.0f
                 navRight.visibility = View.VISIBLE
                 navRight.isEnabled = true
+                return Function<Unit, Unit> { }
             } else {
+                val animators = arrayOfNulls<Animator>(textViewList.size)
                 for (i in textViewList.indices)
-                    ObjectAnimator.ofFloat(textViewList[i], "alpha", 1.0f).apply {
+                     animators[i] = ObjectAnimator.ofFloat(textViewList[i], "alpha", 1.0f).apply {
                         duration = DURATION
                         startDelay = i * (DURATION + PAUSE_DURATION) + INITIAL_DELAY
                         start()
                     }
-                Handler().postDelayed({
+                val handler = Handler().apply {
+                    this.postDelayed({
+                        navRight.visibility = View.VISIBLE
+                        navRight.isEnabled = true
+                    }, (DURATION + PAUSE_DURATION) * textViewList.size + INITIAL_DELAY)
+                }
+                return Function<Unit, Unit>{
+                    for(i in animators.indices) {
+                        animators[i]!!.end()
+                    }
+                    handler.removeCallbacksAndMessages(null)
                     navRight.visibility = View.VISIBLE
                     navRight.isEnabled = true
-                }, textViewList.size * (DURATION + PAUSE_DURATION) + INITIAL_DELAY)
+                }
             }
+
         }
 
         fun animateListIn (context: Context, adapter: ContentListAdapter,
@@ -85,8 +100,9 @@ class PageTextAnimUtil private constructor(){
 
 
 
-        class ContentListAdapter(val textList: Array<String?>,
-                                 val layoutInflater: LayoutInflater) : BaseAdapter() {
+        class ContentListAdapter(
+            private val textList: Array<String?>,
+            private val layoutInflater: LayoutInflater) : BaseAdapter() {
             private var textViews = arrayListOf<View>()
 
             override fun getItem(position: Int): Any {

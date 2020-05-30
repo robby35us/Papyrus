@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import androidx.cardview.widget.CardView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.LiveData
@@ -23,6 +24,7 @@ class ModuleListFragment : Fragment() {
     private val viewModel: MainViewModel by activityViewModels()
 
     private lateinit var pageLiveData: LiveData<Page>
+    private lateinit var card: CardView
     private lateinit var context: TextView
     private lateinit var header: TextView
     private lateinit var subHeader: TextView
@@ -40,6 +42,9 @@ class ModuleListFragment : Fragment() {
         val view = inflater.inflate(R.layout.fragment_module_list, container, false)
 
         Log.i("MODULE_LIST_FRAGMENT", "in onCreateView")
+
+        card = view.findViewById(R.id.card)
+
 
         context = view.findViewById(R.id.context)
         header = view.findViewById(R.id.header)
@@ -88,14 +93,17 @@ class ModuleListFragment : Fragment() {
         return view
     }
 
-    val observer = Observer<Page> {
+    private val observer = Observer<Page> {
         pageLiveData.removeObservers(viewLifecycleOwner)
-        PageTextAnimUtil.animateListIn(
+        val cancel = PageTextAnimUtil.animateListIn(
             requireContext(),
             adapter,
             navRight,
             viewModel.locationPreviouslyReached()
         )
+        card.setOnClickListener {
+            cancel.apply {  }
+        }
     }
 
     override fun onStart() {

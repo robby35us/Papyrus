@@ -36,7 +36,7 @@ class ModuleSelectionFragment : Fragment() {
 
         val pageLiveData = viewModel.currentPage()
 
-        cardView = view.findViewById(R.id.module_card)
+        cardView = view.findViewById(R.id.card)
 
         context  = view.findViewById(R.id.context)
         header = view.findViewById(R.id.header)
@@ -99,7 +99,7 @@ class ModuleSelectionFragment : Fragment() {
                     navRight.isEnabled = true
                     navRight.visibility = View.VISIBLE
                 }
-            }
+            };
         })
         return view
     }

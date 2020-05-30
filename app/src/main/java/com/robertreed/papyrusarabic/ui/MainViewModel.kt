@@ -81,11 +81,11 @@ class MainViewModel : ViewModel() {
             "lessonContent" -> LessonContentFragment.newInstance()
             "lessonImage" -> LessonImageFragment.newInstance()
             "mediaPlayer" -> LessonMediaFragment.newInstance()
-            else -> SplashScreen.newInstance()
+            else -> ContentFailureFragment.newInstance()
         }
     }
 
-    fun getCurrentPageTypeName() = pageTypes.get(pageData.value!!.pageType!!).name
+    private fun getCurrentPageTypeName() = pageTypes.get(pageData.value!!.pageType!!).name
 
     fun getMedia() = repository.getMediaIterator(
         currentLocation.moduleNum, currentLocation.lessonNum, currentLocation.pageNum
@@ -255,7 +255,6 @@ class MainViewModel : ViewModel() {
             }
             return
         }
-
 
         if (lessonIt.isLoaded()) {
             lessonIt.setIndex(currentLocation.lessonNum)

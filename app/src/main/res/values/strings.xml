@@ -1,7 +1,6 @@
 <resources>
     <string name="app_name">Papyrus Arabic</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="continue_tap_anywhere">Tap anywhere to continue!</string>
     <string name="navigate_to_previous">Go to previous page</string>
@@ -13,4 +12,6 @@
     <string name="restart_lesson">Restart Lesson</string>
     <string name="sample_toast_onclick">You clicked a button!</string>
     <string name="content_description_alphabet">The 28 letters of the Arabic Alphabet</string>
+    <string name="header_no_content">Unable to load content</string>
+    <string name="sub_header_no_content">Sorry, but this content can\'t be loaded right now. The developer will be notified.</string>
 </resources>

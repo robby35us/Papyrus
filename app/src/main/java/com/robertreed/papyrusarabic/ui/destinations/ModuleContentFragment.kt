@@ -8,9 +8,12 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.TextView
+import androidx.cardview.widget.CardView
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import com.robertreed.papyrusarabic.R
+import com.robertreed.papyrusarabic.model.Page
 import com.robertreed.papyrusarabic.ui.*
 import com.robertreed.papyrusarabic.ui.animations.PageTextAnimUtil
 
@@ -18,6 +21,9 @@ class ModuleContentFragment : Fragment() {
 
     private val viewModel : MainViewModel by activityViewModels()
 
+    private lateinit var pageLiveData: LiveData<Page>
+
+    private lateinit var card: CardView
     private lateinit var context: TextView
     private lateinit var header: TextView
     private lateinit var content1: TextView
@@ -34,7 +40,9 @@ class ModuleContentFragment : Fragment() {
         val view = inflater.inflate(R.layout.fragment_module_content, container, false)
 
         Log.i("MODULE_CONTENT_FRAGMENT", "in onCreateView")
-        val pageLiveData = viewModel.currentPage()
+        pageLiveData = viewModel.currentPage()
+
+        card = view.findViewById(R.id.card)
 
         context = view.findViewById(R.id.context)
         header = view.findViewById(R.id.header)
@@ -71,7 +79,6 @@ class ModuleContentFragment : Fragment() {
 
         pageLiveData.observe(viewLifecycleOwner, Observer { page ->
             if(viewModel.hasPageLoaded()) {
-                pageLiveData.removeObservers(viewLifecycleOwner)
                 context.text = page.number.toString()
                 header.text = page.header
                 content1.text = page.content1
@@ -84,13 +91,23 @@ class ModuleContentFragment : Fragment() {
         return view
     }
 
+    private val observer = Observer<Page> {
+        if(viewModel.hasPageLoaded()) {
+            pageLiveData.removeObservers(viewLifecycleOwner)
+            val cancel = PageTextAnimUtil.fadeInText(
+                listOf(content1, content2, content3),
+                navRight,
+                viewModel.locationPreviouslyReached()
+            )
+            card.setOnClickListener {
+                cancel.apply(null)
+            }
+        }
+    }
+
     override fun onStart() {
         super.onStart()
-        PageTextAnimUtil.fadeInText(
-            listOf(content1, content2, content3),
-            navRight,
-            viewModel.locationPreviouslyReached()
-        )
+        pageLiveData.observe(viewLifecycleOwner, observer)
     }
 
     companion object {
